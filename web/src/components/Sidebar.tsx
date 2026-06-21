@@ -6,6 +6,7 @@ import { api } from "../api/client";
 import { useAuth } from "../state/AuthContext";
 import { Kbd } from "./ui/Kbd";
 import { Avatar } from "./ui/Avatar";
+import { SettingsPopover } from "./SettingsPopover";
 import type { Folder, Note, TagCount } from "../types";
 
 const NAV_BASE: React.CSSProperties = {
@@ -59,6 +60,7 @@ export function Sidebar() {
   const navigate = useNavigate();
   const params = useParams<{ id?: string }>();
   const queryClient = useQueryClient();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { data: folders = [] } = useQuery<Folder[]>({
     queryKey: ["folders"],
@@ -79,6 +81,7 @@ export function Sidebar() {
     mutationFn: () => api.createNote({}),
     onSuccess: (note) => {
       void queryClient.invalidateQueries({ queryKey: ["folders"] });
+      void queryClient.invalidateQueries({ queryKey: ["notes"] });
       navigate(`/note/${note.id}`);
     },
   });
@@ -338,8 +341,10 @@ export function Sidebar() {
             padding: "12px 8px 4px",
             borderTop: "1px solid var(--border)",
             flexShrink: 0,
+            position: "relative",
           }}
         >
+          {settingsOpen && <SettingsPopover onClose={() => setSettingsOpen(false)} />}
           <Avatar name={user.name} src={user.avatarUrl} size={32} />
           <div
             style={{
@@ -373,11 +378,22 @@ export function Sidebar() {
               {user.email}
             </span>
           </div>
-          <span
-            style={{ color: "var(--text-3)", display: "flex", cursor: "pointer" }}
+          <button
+            onClick={() => setSettingsOpen((o) => !o)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--text-3)",
+              cursor: "pointer",
+              background: "transparent",
+              border: "none",
+              padding: "4px",
+              borderRadius: "6px",
+            }}
           >
             <SlidersHorizontal size={16} strokeWidth={1.8} />
-          </span>
+          </button>
         </div>
       )}
     </aside>
