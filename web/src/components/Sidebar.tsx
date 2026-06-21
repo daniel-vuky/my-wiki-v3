@@ -443,7 +443,7 @@ function FolderTreeNode({
   return (
     <>
       <NavRow active={isActive} onClick={() => onNavigate(folder.id)}>
-        <span style={{ paddingLeft: `${depth * 14}px`, display: "flex", flexShrink: 0 }} />
+        {depth > 0 && <span style={{ paddingLeft: `${depth * 14}px`, display: "flex", flexShrink: 0 }} />}
         <span
           onClick={(e) => {
             if (hasChildren) {
