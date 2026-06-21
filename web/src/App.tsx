@@ -7,6 +7,7 @@ import Home from "./screens/Home";
 import Folder from "./screens/Folder";
 import Editor from "./screens/Editor";
 import Search from "./screens/Search";
+import Tag from "./screens/Tag";
 import type { JSX } from "react";
 
 const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } } });
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="/folder/:id" element={<Guard><Folder /></Guard>} />
               <Route path="/note/:id" element={<Guard><Editor /></Guard>} />
               <Route path="/search" element={<Guard><Search /></Guard>} />
+              <Route path="/tag/:name" element={<Guard><Tag /></Guard>} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>
