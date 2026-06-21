@@ -14,14 +14,15 @@ export async function listFolders(userId: string) {
   return rows.map((f) => ({ ...f, count: map.get(f.id) ?? 0 }));
 }
 
-export async function createFolder(userId: string, data: { name: string; color: string; description?: string }) {
+export async function createFolder(userId: string, data: { name: string; color: string; description?: string; parentId?: string | null }) {
   const [row] = await db.insert(folders).values({
     userId, name: data.name, slug: slugify(data.name), color: data.color, description: data.description ?? "",
+    parentId: data.parentId ?? null,
   }).returning();
   return row;
 }
 
-export async function updateFolder(userId: string, id: string, data: Partial<{ name: string; color: string; description: string; sortOrder: number }>) {
+export async function updateFolder(userId: string, id: string, data: Partial<{ name: string; color: string; description: string; sortOrder: number; parentId: string | null }>) {
   const patch: any = { ...data, updatedAt: new Date() };
   if (data.name) patch.slug = slugify(data.name);
   const [row] = await db.update(folders).set(patch).where(and(eq(folders.id, id), eq(folders.userId, userId))).returning();

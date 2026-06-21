@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, boolean, integer, timestamp, primaryKey, customType } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, boolean, integer, timestamp, primaryKey, customType, type AnyPgColumn } from "drizzle-orm/pg-core";
 
 const tsvector = customType<{ data: string }>({ dataType: () => "tsvector" });
 
@@ -22,6 +22,7 @@ export const prefs = pgTable("prefs", {
 export const folders = pgTable("folders", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  parentId: uuid("parent_id").references((): AnyPgColumn => folders.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   slug: text("slug").notNull(),
   color: text("color").notNull(),
