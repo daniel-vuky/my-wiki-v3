@@ -10,6 +10,8 @@ import Search from "./screens/Search";
 import Tag from "./screens/Tag";
 import AllNotes from "./screens/AllNotes";
 import AllFolders from "./screens/AllFolders";
+import FavouritePosts from "./screens/FavouritePosts";
+import FavouriteFolders from "./screens/FavouriteFolders";
 import type { JSX } from "react";
 
 const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } } });
@@ -35,6 +37,8 @@ export default function App() {
               <Route path="/tag/:name" element={<Guard><Tag /></Guard>} />
               <Route path="/notes" element={<Guard><AllNotes /></Guard>} />
               <Route path="/folders" element={<Guard><AllFolders /></Guard>} />
+              <Route path="/favourites/posts" element={<Guard><FavouritePosts /></Guard>} />
+              <Route path="/favourites/folders" element={<Guard><FavouriteFolders /></Guard>} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>

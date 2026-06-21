@@ -62,6 +62,8 @@ export function Sidebar() {
   const params = useParams<{ id?: string }>();
   const queryClient = useQueryClient();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [favPostsHovered, setFavPostsHovered] = useState(false);
+  const [favFoldersHovered, setFavFoldersHovered] = useState(false);
 
   const { data: folders = [] } = useQuery<Folder[]>({
     queryKey: ["folders"],
@@ -216,17 +218,27 @@ export function Sidebar() {
       {/* Overflow scrollable area */}
       <div style={{ flex: 1, overflow: "auto", minHeight: 0 }}>
         {/* Favourite posts section */}
-        <div
+        <button
+          onClick={() => navigate("/favourites/posts")}
+          onMouseEnter={() => setFavPostsHovered(true)}
+          onMouseLeave={() => setFavPostsHovered(false)}
           style={{
             font: "600 10.5px/1 'Schibsted Grotesk', sans-serif",
             letterSpacing: ".07em",
             textTransform: "uppercase",
-            color: "var(--text-3)",
+            color: favPostsHovered ? "var(--text-2)" : "var(--text-3)",
             padding: "4px 10px 6px",
+            display: "block",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            width: "100%",
+            textAlign: "left",
+            transition: "color .15s",
           }}
         >
           Favourite posts
-        </div>
+        </button>
         {favoritePosts.map((note) => (
           <NavRow key={note.id} onClick={() => navigate(`/note/${note.id}`)}>
             <span style={{ color: "var(--accent-text)", display: "flex", flexShrink: 0 }}>
@@ -246,17 +258,27 @@ export function Sidebar() {
         ))}
 
         {/* Favourite folders section */}
-        <div
+        <button
+          onClick={() => navigate("/favourites/folders")}
+          onMouseEnter={() => setFavFoldersHovered(true)}
+          onMouseLeave={() => setFavFoldersHovered(false)}
           style={{
             font: "600 10.5px/1 'Schibsted Grotesk', sans-serif",
             letterSpacing: ".07em",
             textTransform: "uppercase",
-            color: "var(--text-3)",
+            color: favFoldersHovered ? "var(--text-2)" : "var(--text-3)",
             padding: "16px 10px 6px",
+            display: "block",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            width: "100%",
+            textAlign: "left",
+            transition: "color .15s",
           }}
         >
           Favourite folders
-        </div>
+        </button>
         {favoriteFolders.length === 0 ? (
           <div
             style={{
@@ -265,7 +287,6 @@ export function Sidebar() {
               color: "var(--text-3)",
             }}
           >
-            No favourite folders yet
           </div>
         ) : (
           favoriteFolders.map((folder) => {
