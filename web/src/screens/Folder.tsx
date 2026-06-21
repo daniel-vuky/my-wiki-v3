@@ -86,25 +86,24 @@ export default function Folder() {
         <div
           style={{
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "center",
             justifyContent: "space-between",
             gap: "16px",
             marginBottom: "4px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1, minWidth: 0 }}>
-            {/* Folder color square */}
-            <div
-              style={{
-                width: "14px",
-                height: "14px",
-                borderRadius: "3px",
-                background: folder.color,
-                flexShrink: 0,
-                marginTop: "6px",
-              }}
-            />
-            <div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* Color square + folder name on the same row */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div
+                style={{
+                  width: "14px",
+                  height: "14px",
+                  borderRadius: "3px",
+                  background: folder.color,
+                  flexShrink: 0,
+                }}
+              />
               <h1
                 style={{
                   font: "600 31px/1.2 'Newsreader', serif",
@@ -114,24 +113,25 @@ export default function Folder() {
               >
                 {folder.name}
               </h1>
-              {(folder.description || folder.count > 0) && (
-                <div
-                  style={{
-                    font: "400 13.5px/1 'Schibsted Grotesk', sans-serif",
-                    color: "var(--text-3)",
-                    marginTop: "6px",
-                  }}
-                >
-                  {folder.description}
-                  {folder.description && " · "}
-                  {folder.count} {folder.count === 1 ? "note" : "notes"}
-                </div>
-              )}
             </div>
+            {/* Description line below the title row */}
+            {(folder.description || folder.count > 0) && (
+              <div
+                style={{
+                  font: "400 13.5px/1 'Schibsted Grotesk', sans-serif",
+                  color: "var(--text-3)",
+                  marginTop: "6px",
+                }}
+              >
+                {folder.description}
+                {folder.description && " · "}
+                {folder.count} {folder.count === 1 ? "note" : "notes"}
+              </div>
+            )}
           </div>
 
           {/* Right controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0, marginTop: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
             {/* Delete folder button */}
             <button
               onClick={handleDeleteFolder}
