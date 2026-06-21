@@ -23,6 +23,7 @@ const NAV_BASE: React.CSSProperties = {
   width: "100%",
   background: "transparent",
   boxSizing: "border-box",
+  textAlign: "left",
 };
 
 function NavRow({
@@ -63,7 +64,7 @@ export function Sidebar() {
   const queryClient = useQueryClient();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [folderModalOpen, setFolderModalOpen] = useState(false);
-  const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
+  const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
 
   const { data: folders = [] } = useQuery<Folder[]>({
     queryKey: ["folders"],
@@ -92,7 +93,7 @@ export function Sidebar() {
   const workspaceName = user ? `${user.name.split(" ")[0]}'s workspace` : "Workspace";
 
   function toggleFolder(fid: string) {
-    setOpenFolders((prev) => {
+    setCollapsedFolders((prev) => {
       const next = new Set(prev);
       if (next.has(fid)) next.delete(fid);
       else next.add(fid);
@@ -296,7 +297,7 @@ export function Sidebar() {
               folders={folders}
               depth={0}
               activeId={params.id}
-              openFolders={openFolders}
+              collapsedFolders={collapsedFolders}
               onToggle={toggleFolder}
               onNavigate={(fid) => navigate(`/folder/${fid}`)}
             />
@@ -423,7 +424,7 @@ function FolderTreeNode({
   folders,
   depth,
   activeId,
-  openFolders,
+  collapsedFolders,
   onToggle,
   onNavigate,
 }: {
@@ -431,13 +432,13 @@ function FolderTreeNode({
   folders: Folder[];
   depth: number;
   activeId?: string;
-  openFolders: Set<string>;
+  collapsedFolders: Set<string>;
   onToggle: (id: string) => void;
   onNavigate: (id: string) => void;
 }) {
   const children = folders.filter((f) => f.parentId === folder.id);
   const hasChildren = children.length > 0;
-  const isOpen = openFolders.has(folder.id);
+  const isOpen = !collapsedFolders.has(folder.id);
   const isActive = activeId === folder.id;
 
   return (
@@ -494,7 +495,7 @@ function FolderTreeNode({
             folders={folders}
             depth={depth + 1}
             activeId={activeId}
-            openFolders={openFolders}
+            collapsedFolders={collapsedFolders}
             onToggle={onToggle}
             onNavigate={onNavigate}
           />
