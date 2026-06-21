@@ -2,7 +2,7 @@
 
 ## Overview
 
-Folio is a personal wiki / note-taking app with a Fastify (TypeScript) API backend, PostgreSQL full-text search, Redis-backed sessions and caching, and a React (Vite + BlockNote) frontend. In production it is accessed through a Cloudflare Tunnel — no ports are published directly.
+Folio is a personal wiki / note-taking app with a Fastify (TypeScript) API backend, PostgreSQL full-text search, Redis-backed sessions and caching, and a React (Vite + BlockNote) frontend. It runs as a self-contained local Docker stack that publishes a single configurable host port; you put your own reverse proxy / Cloudflare tunnel in front of it for public access.
 
 ### 5-container architecture
 
@@ -11,10 +11,9 @@ Folio is a personal wiki / note-taking app with a Fastify (TypeScript) API backe
 | **db** | postgres:16-alpine | Primary store, full-text search via tsvector/GIN |
 | **redis** | redis:7-alpine | Sessions, hot-read cache, search cache, rate-limit counter |
 | **api** | ./api (node:22-alpine) | Fastify REST API on port 3000, runs migrations on boot |
-| **web** | ./web (nginx:alpine) | Serves Vite SPA, proxies `/api/` → `api:3000` |
-| **cloudflared** | cloudflare/cloudflared | Tunnel client — routes public HTTPS → `web:80` |
+| **web** | ./web (nginx:alpine) | Serves Vite SPA, proxies `/api/` → `api:${API_PORT}` |
 
-No host ports are published in the compose file; all traffic reaches the stack through the Cloudflare tunnel in production.
+Only the **web** container publishes a host port (`WEB_PORT`, default `8080`). Put your own reverse proxy / Cloudflare tunnel in front of it — the project does not run or manage a tunnel itself. `db`, `redis`, and `api` are reachable only on the project's internal Docker network, so they never collide with other projects on the same host.
 
 ---
 
@@ -22,8 +21,7 @@ No host ports are published in the compose file; all traffic reaches the stack t
 
 - Docker + Docker Compose v2
 - A **Google OAuth 2.0** client ID and secret — create one at <https://console.cloud.google.com/apis/credentials>
-  - Authorised redirect URI: `https://<your-tunnel-domain>/api/auth/google/callback`
-- A **Cloudflare Tunnel** token — create a tunnel at <https://one.dash.cloudflare.com> and copy the token
+  - Authorised redirect URI: `<PUBLIC_BASE_URL>/api/auth/google/callback` (e.g. `http://localhost:8080/api/auth/google/callback` locally, or `https://<your-domain>/api/auth/google/callback` behind your proxy)
 
 ---
 
@@ -40,11 +38,12 @@ Edit `.env` and fill in every value:
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | Postgres credentials (also used in `DATABASE_URL`) |
 | `DATABASE_URL` | `postgres://<user>:<password>@db:5432/<db>` |
 | `REDIS_URL` | `redis://redis:6379` (default works unchanged) |
+| `WEB_PORT` | Host port the app is published on (default `8080`). Change to avoid clashes with other projects |
+| `API_PORT` | Internal api listen port (default `3000`); not published to the host |
 | `SESSION_SECRET` | Random string, minimum 32 bytes |
-| `PUBLIC_BASE_URL` | Full HTTPS URL of your tunnel domain, e.g. `https://folio.example.com` |
+| `PUBLIC_BASE_URL` | Origin the app is served from — `http://localhost:<WEB_PORT>` locally, or your public `https://` domain behind a proxy |
 | `GOOGLE_CLIENT_ID` | From Google Cloud Console |
 | `GOOGLE_CLIENT_SECRET` | From Google Cloud Console |
-| `CLOUDFLARE_TUNNEL_TOKEN` | From Cloudflare dashboard |
 | `ALLOWED_EMAILS` | Optional comma-separated list to restrict logins; leave empty to allow any Google account |
 
 > **Important:** `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` must be non-empty — the api validates all required env vars on boot and will crash with `Missing required env var: <name>` if any are blank.
@@ -53,19 +52,17 @@ Edit `.env` and fill in every value:
 
 ## Run
 
-### Full production stack (all 5 services)
+### Full stack (all 4 services)
 
 ```bash
 docker compose up -d --build
 ```
 
-### Local dev without a Cloudflare tunnel
+The app is then served at `http://localhost:${WEB_PORT}` (default <http://localhost:8080>). Point your own reverse proxy / Cloudflare tunnel at that host port for public access.
 
-Start only the infrastructure and static frontend:
+### Local dev (hot reload)
 
-```bash
-docker compose up -d db redis api web
-```
+The full stack already runs everything; for frontend hot-reload use the Vite dev server instead of the `web` container:
 
 Then use the Vite dev server for hot-reload frontend development:
 
@@ -165,7 +162,7 @@ The following was verified on 2026-06-21 using `docker compose build api web` + 
 
 ## Deferred / Manual Steps (Require Real Secrets)
 
-The following steps cannot be automated without a real Google OAuth client and a Cloudflare tunnel token. Run them manually once credentials are in `.env`:
+The following steps cannot be automated without a real Google OAuth client. Run them manually once credentials are in `.env`:
 
 1. **Google sign-in flow** — navigate to `https://<your-domain>/`, click "Sign in with Google", confirm redirect to `/api/auth/google` and callback to `/api/auth/google/callback`, then landing on the dashboard.
 2. **Auto-seeding on first login** — confirm 6 default folders and sample notes appear for the new user.
@@ -175,5 +172,5 @@ The following steps cannot be automated without a real Google OAuth client and a
 6. **Full-text search** — search for a word in a note body; confirm highlighted results appear.
 7. **Theme / accent / font persistence** — change theme, accent colour, and font in Settings; reload the page; confirm preferences persisted.
 8. **ALLOWED_EMAILS restriction** — set `ALLOWED_EMAILS` to a specific address; confirm a different Google account is rejected.
-9. **Cloudflare tunnel** — set `CLOUDFLARE_TUNNEL_TOKEN` and `docker compose up -d cloudflared`; confirm the public domain is reachable and TLS is valid.
+9. **Public access** — point your own reverse proxy / Cloudflare tunnel at `localhost:${WEB_PORT}`; confirm the public domain is reachable and TLS is valid.
 10. **Backup script** — run `./scripts/backup.sh` with a real running stack and confirm the `.sql.gz` is restorable.
