@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { requireAuth } from "../auth/middleware.js";
-import { listFolders, createFolder, updateFolder, deleteFolder } from "../services/folders.js";
+import { listFolders, createFolder, updateFolder, deleteFolder, toggleFolderFavorite } from "../services/folders.js";
 import { cacheKey, cached, invalidate } from "../cache/redis.js";
 
 export async function folderRoutes(app: FastifyInstance) {
@@ -51,5 +51,11 @@ export async function folderRoutes(app: FastifyInstance) {
     await deleteFolder(req.userId!, (req.params as any).id);
     await invalidate(`folders:${req.userId}*`);
     return { ok: true };
+  });
+
+  app.post("/api/folders/:id/favorite", async (req) => {
+    const r = await toggleFolderFavorite(req.userId!, (req.params as any).id);
+    await invalidate(`folders:${req.userId}*`);
+    return r;
   });
 }

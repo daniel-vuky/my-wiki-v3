@@ -28,6 +28,7 @@ export const folders = pgTable("folders", {
   color: text("color").notNull(),
   description: text("description").default("").notNull(),
   sortOrder: integer("sort_order").default(0).notNull(),
+  favorite: boolean("favorite").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

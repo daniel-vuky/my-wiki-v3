@@ -32,3 +32,10 @@ export async function updateFolder(userId: string, id: string, data: Partial<{ n
 export async function deleteFolder(userId: string, id: string) {
   await db.delete(folders).where(and(eq(folders.id, id), eq(folders.userId, userId)));
 }
+
+export async function toggleFolderFavorite(userId: string, id: string) {
+  const [f] = await db.select().from(folders).where(and(eq(folders.id, id), eq(folders.userId, userId)));
+  if (!f) return null;
+  await db.update(folders).set({ favorite: !f.favorite, updatedAt: new Date() }).where(eq(folders.id, id));
+  return { id, favorite: !f.favorite };
+}

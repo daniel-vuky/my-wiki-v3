@@ -22,6 +22,13 @@
       "when": 1782039072831,
       "tag": "0002_melodic_johnny_blaze",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782041345993,
+      "tag": "0003_striped_mattie_franklin",
+      "breakpoints": true
     }
   ]
 }
