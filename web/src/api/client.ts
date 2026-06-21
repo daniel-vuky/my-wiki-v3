@@ -29,6 +29,7 @@ export const api = {
     req<Note>(`/api/notes/${id}`, { method: "PATCH", body: JSON.stringify(b) }),
   favorite: (id: string) => req<{ id: string; favorite: boolean }>(`/api/notes/${id}/favorite`, { method: "POST" }),
   deleteNote: (id: string) => req(`/api/notes/${id}`, { method: "DELETE" }),
+  deleteFolder: (id: string) => req(`/api/folders/${id}`, { method: "DELETE" }),
   tags: () => req<TagCount[]>("/api/tags"),
   search: (q: string, folder?: string) => req<SearchResponse>(`/api/search?q=${encodeURIComponent(q)}${folder ? `&folder=${folder}` : ""}`),
   updatePrefs: (b: Partial<{ theme: string; accent: string; editorFont: string }>) =>

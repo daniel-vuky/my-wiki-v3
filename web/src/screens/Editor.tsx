@@ -1,8 +1,8 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "../components/AppShell";
-import { Star, MoreHorizontal, Upload, ArrowLeft } from "../components/icons";
+import { Star, MoreHorizontal, Upload, ArrowLeft, Trash2 } from "../components/icons";
 import { api } from "../api/client";
 import { usePrefs } from "../state/PrefsContext";
 import { relativeTime } from "../lib/time";
@@ -54,6 +54,66 @@ export default function Editor() {
       qc.invalidateQueries({ queryKey: ["notes"] });
     },
   });
+
+  // Tag editing state
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+
+  // Sync tags when note loads or id changes
+  useEffect(() => {
+    if (noteQuery.data) {
+      setTags(noteQuery.data.tags);
+    }
+  }, [noteQuery.data?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const tagMutation = useMutation({
+    mutationFn: (newTags: string[]) => api.updateNote(id!, { tags: newTags }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["tags"] });
+      void qc.invalidateQueries({ queryKey: ["notes"] });
+      void qc.invalidateQueries({ queryKey: ["note", id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => api.deleteNote(id!),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["notes"] });
+      void qc.invalidateQueries({ queryKey: ["folders"] });
+      navigate("/");
+    },
+  });
+
+  function handleAddTag(raw: string) {
+    const tag = raw.trim().toLowerCase().replace(/^#/, "");
+    if (!tag || tags.includes(tag)) {
+      setTagInput("");
+      return;
+    }
+    const newTags = [...tags, tag];
+    setTags(newTags);
+    setTagInput("");
+    tagMutation.mutate(newTags);
+  }
+
+  function handleRemoveTag(tag: string) {
+    const newTags = tags.filter((t) => t !== tag);
+    setTags(newTags);
+    tagMutation.mutate(newTags);
+  }
+
+  function handleTagKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      handleAddTag(tagInput);
+    }
+  }
+
+  function handleDeleteNote() {
+    if (window.confirm("Delete this note? This cannot be undone.")) {
+      deleteMutation.mutate();
+    }
+  }
 
   // Debounced title save
   const titleTimer = useRef<number | undefined>(undefined);
@@ -232,6 +292,30 @@ export default function Editor() {
             <MoreHorizontal size={16} strokeWidth={1.8} />
           </button>
 
+          {/* Delete note */}
+          <button
+            onClick={handleDeleteNote}
+            title="Delete note"
+            disabled={deleteMutation.isPending}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "32px",
+              height: "32px",
+              borderRadius: "7px",
+              border: "none",
+              background: "transparent",
+              color: deleteMutation.isPending ? "var(--text-3)" : "var(--text-3)",
+              cursor: deleteMutation.isPending ? "not-allowed" : "pointer",
+              transition: "color .12s, background .12s",
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#e53e3e"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-3)"; }}
+          >
+            <Trash2 size={16} strokeWidth={1.8} />
+          </button>
+
           {/* Share (placeholder per spec §9) */}
           <button
             onClick={() => console.log("Share note:", id)}
@@ -296,31 +380,72 @@ export default function Editor() {
             }}
           />
 
-          {/* Tag meta row */}
+          {/* Tag meta row — editable */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "6px",
               flexWrap: "wrap",
               marginBottom: "28px",
               font: "400 12.5px/1 'Schibsted Grotesk', sans-serif",
               color: "var(--text-3)",
             }}
           >
-            {note.tags.map((tag) => (
+            {tags.map((tag) => (
               <span
                 key={tag}
                 style={{
-                  fontFamily: "'Fira Mono', 'Cascadia Code', monospace",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  padding: "3px 8px",
+                  borderRadius: "6px",
+                  background: "var(--surface-2)",
+                  fontFamily: "'JetBrains Mono', monospace",
                   fontSize: "12px",
                   color: "var(--text-2)",
                 }}
               >
                 #{tag}
+                <button
+                  onClick={() => handleRemoveTag(tag)}
+                  title={`Remove tag ${tag}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "none",
+                    border: "none",
+                    padding: "0",
+                    marginLeft: "1px",
+                    cursor: "pointer",
+                    color: "var(--text-3)",
+                    fontSize: "12px",
+                    lineHeight: 1,
+                  }}
+                >
+                  ×
+                </button>
               </span>
             ))}
-            {note.tags.length > 0 && (
+            <input
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleTagKeyDown}
+              onBlur={() => { if (tagInput.trim()) handleAddTag(tagInput); }}
+              placeholder="add tag…"
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                font: "400 12.5px/1 'Schibsted Grotesk', sans-serif",
+                color: "var(--text-3)",
+                minWidth: "70px",
+                width: `${Math.max(70, tagInput.length * 8 + 20)}px`,
+              }}
+            />
+            {tags.length > 0 && (
               <span style={{ color: "var(--border)" }}>·</span>
             )}
             <span>Updated {new Date(note.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
