@@ -1,5 +1,5 @@
 export {
   Search, Plus, ChevronDown, ChevronRight, Folder, Star, Share2 as Share, MoreHorizontal,
   Info, Link as LinkIcon, Bold, Italic, Underline, Code, Hash, Check, Upload,
-  SlidersHorizontal, LayoutGrid, List, Filter, X,
+  SlidersHorizontal, LayoutGrid, List, Filter, X, ArrowLeft,
 } from "lucide-react";

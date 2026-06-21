@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "../components/AppShell";
-import { Star, MoreHorizontal, Upload } from "../components/icons";
+import { Star, MoreHorizontal, Upload, ArrowLeft } from "../components/icons";
 import { api } from "../api/client";
 import { usePrefs } from "../state/PrefsContext";
 import { relativeTime } from "../lib/time";
@@ -11,6 +11,7 @@ import type { Folder, Note } from "../types";
 
 export default function Editor() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { prefs } = usePrefs();
   const qc = useQueryClient();
 
@@ -94,6 +95,28 @@ export default function Editor() {
           gap: "16px",
         }}
       >
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          title="Back"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "32px",
+            height: "32px",
+            borderRadius: "7px",
+            border: "none",
+            background: "transparent",
+            color: "var(--text-3)",
+            cursor: "pointer",
+            flexShrink: 0,
+            transition: "background .12s",
+          }}
+        >
+          <ArrowLeft size={16} strokeWidth={1.8} />
+        </button>
+
         {/* Left: breadcrumb */}
         <div
           style={{
@@ -104,6 +127,7 @@ export default function Editor() {
             color: "var(--text-3)",
             minWidth: 0,
             overflow: "hidden",
+            flex: 1,
           }}
         >
           {folder && (

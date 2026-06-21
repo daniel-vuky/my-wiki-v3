@@ -1,6 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Filter } from "lucide-react";
 import { AppShell } from "../components/AppShell";
 import { Card } from "../components/ui/Card";
 import { Chip } from "../components/ui/Chip";
@@ -95,23 +94,6 @@ export default function Home() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-              padding: "8px 14px",
-              borderRadius: "8px",
-              background: "transparent",
-              border: "1px solid var(--border)",
-              color: "var(--text-2)",
-              font: "500 13px/1 'Schibsted Grotesk', sans-serif",
-              cursor: "pointer",
-            }}
-          >
-            <Filter size={14} strokeWidth={1.8} />
-            Filter
-          </button>
           <button
             onClick={() => createNote.mutate()}
             disabled={createNote.isPending}
