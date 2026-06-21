@@ -160,7 +160,7 @@ export default function Editor() {
               marginRight: "4px",
             }}
           >
-            Edited {relativeTime(note.updatedAt)} ago
+            Edited {relativeTime(note.updatedAt)}
           </span>
 
           {/* Star / favorite */}
