@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Plus, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
+import { Search, Plus, ChevronDown, ChevronRight, Star, SlidersHorizontal } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../state/AuthContext";
 import { Kbd } from "./ui/Kbd";
 import { Avatar } from "./ui/Avatar";
 import { SettingsPopover } from "./SettingsPopover";
+import { FolderModal } from "./FolderModal";
 import type { Folder, Note, TagCount } from "../types";
 
 const NAV_BASE: React.CSSProperties = {
@@ -61,6 +62,8 @@ export function Sidebar() {
   const params = useParams<{ id?: string }>();
   const queryClient = useQueryClient();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [folderModalOpen, setFolderModalOpen] = useState(false);
+  const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
 
   const { data: folders = [] } = useQuery<Folder[]>({
     queryKey: ["folders"],
@@ -88,6 +91,15 @@ export function Sidebar() {
 
   const workspaceName = user ? `${user.name.split(" ")[0]}'s workspace` : "Workspace";
 
+  function toggleFolder(fid: string) {
+    setOpenFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(fid)) next.delete(fid);
+      else next.add(fid);
+      return next;
+    });
+  }
+
   return (
     <aside
       style={{
@@ -105,11 +117,13 @@ export function Sidebar() {
     >
       {/* Workspace header */}
       <div
+        onClick={() => navigate("/")}
         style={{
           display: "flex",
           alignItems: "center",
           gap: "10px",
           padding: "6px 8px 14px",
+          cursor: "pointer",
         }}
       >
         <div
@@ -254,41 +268,39 @@ export function Sidebar() {
           }}
         >
           Folders
-          <span
-            style={{ marginLeft: "auto", color: "var(--text-3)", display: "flex" }}
+          <button
+            onClick={() => setFolderModalOpen(true)}
+            title="New folder"
+            style={{
+              marginLeft: "auto",
+              color: "var(--text-3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "transparent",
+              border: "none",
+              padding: "2px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
           >
             <Plus size={13} strokeWidth={2.2} />
-          </span>
+          </button>
         </div>
-        {folders.map((folder) => {
-          const isActive = params.id === folder.id;
-          return (
-            <NavRow
-              key={folder.id}
-              active={isActive}
-              onClick={() => navigate(`/folder/${folder.id}`)}
-            >
-              <span
-                style={{
-                  width: "9px",
-                  height: "9px",
-                  borderRadius: "50%",
-                  flexShrink: 0,
-                  background: folder.color,
-                }}
-              />
-              <span style={{ flex: 1 }}>{folder.name}</span>
-              <span
-                style={{
-                  font: "500 11.5px/1 'JetBrains Mono', monospace",
-                  color: isActive ? "var(--accent-text)" : "var(--text-3)",
-                }}
-              >
-                {folder.count}
-              </span>
-            </NavRow>
-          );
-        })}
+        {folders
+          .filter((f) => f.parentId == null)
+          .map((root) => (
+            <FolderTreeNode
+              key={root.id}
+              folder={root}
+              folders={folders}
+              depth={0}
+              activeId={params.id}
+              openFolders={openFolders}
+              onToggle={toggleFolder}
+              onNavigate={(fid) => navigate(`/folder/${fid}`)}
+            />
+          ))}
 
         {/* Tags section */}
         <div
@@ -311,8 +323,9 @@ export function Sidebar() {
           }}
         >
           {tags.map((tag) => (
-            <span
+            <button
               key={tag.id}
+              onClick={() => navigate(`/tag/${encodeURIComponent(tag.name)}`)}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -321,11 +334,12 @@ export function Sidebar() {
                 background: "var(--surface-2)",
                 color: "var(--text-2)",
                 font: "500 11.5px/1 'JetBrains Mono', monospace",
+                border: "none",
                 cursor: "pointer",
               }}
             >
               #{tag.name}
-            </span>
+            </button>
           ))}
         </div>
       </div>
@@ -396,6 +410,95 @@ export function Sidebar() {
           </button>
         </div>
       )}
+
+      {folderModalOpen && (
+        <FolderModal onClose={() => setFolderModalOpen(false)} />
+      )}
     </aside>
+  );
+}
+
+function FolderTreeNode({
+  folder,
+  folders,
+  depth,
+  activeId,
+  openFolders,
+  onToggle,
+  onNavigate,
+}: {
+  folder: Folder;
+  folders: Folder[];
+  depth: number;
+  activeId?: string;
+  openFolders: Set<string>;
+  onToggle: (id: string) => void;
+  onNavigate: (id: string) => void;
+}) {
+  const children = folders.filter((f) => f.parentId === folder.id);
+  const hasChildren = children.length > 0;
+  const isOpen = openFolders.has(folder.id);
+  const isActive = activeId === folder.id;
+
+  return (
+    <>
+      <NavRow active={isActive} onClick={() => onNavigate(folder.id)}>
+        <span style={{ paddingLeft: `${depth * 14}px`, display: "flex", flexShrink: 0 }} />
+        <span
+          onClick={(e) => {
+            if (hasChildren) {
+              e.stopPropagation();
+              onToggle(folder.id);
+            }
+          }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "14px",
+            flexShrink: 0,
+            color: "var(--text-3)",
+            cursor: hasChildren ? "pointer" : "default",
+          }}
+        >
+          {hasChildren &&
+            (isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />)}
+        </span>
+        <span
+          style={{
+            width: "9px",
+            height: "9px",
+            borderRadius: "50%",
+            flexShrink: 0,
+            background: folder.color,
+          }}
+        />
+        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {folder.name}
+        </span>
+        <span
+          style={{
+            font: "500 11.5px/1 'JetBrains Mono', monospace",
+            color: isActive ? "var(--accent-text)" : "var(--text-3)",
+          }}
+        >
+          {folder.count}
+        </span>
+      </NavRow>
+      {hasChildren &&
+        isOpen &&
+        children.map((child) => (
+          <FolderTreeNode
+            key={child.id}
+            folder={child}
+            folders={folders}
+            depth={depth + 1}
+            activeId={activeId}
+            openFolders={openFolders}
+            onToggle={onToggle}
+            onNavigate={onNavigate}
+          />
+        ))}
+    </>
   );
 }

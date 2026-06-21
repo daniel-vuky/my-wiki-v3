@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { List, LayoutGrid } from "lucide-react";
+import { List, LayoutGrid, Plus } from "lucide-react";
 import { AppShell } from "../components/AppShell";
 import { Card } from "../components/ui/Card";
 import { Chip } from "../components/ui/Chip";
+import { FolderModal } from "../components/FolderModal";
 import { api } from "../api/client";
 import { relativeTime } from "../lib/time";
 import { extractSnippet } from "../lib/snippet";
@@ -13,8 +14,9 @@ import type { Folder as FolderType, Note } from "../types";
 export default function Folder() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [view, setView] = useState<"list" | "grid">("list");
+  const [view, setView] = useState<"list" | "grid">("grid");
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [subfolderModalOpen, setSubfolderModalOpen] = useState(false);
 
   const { data: folders = [] } = useQuery<FolderType[]>({
     queryKey: ["folders"],
@@ -28,6 +30,7 @@ export default function Folder() {
   });
 
   const folder = folders.find((f) => f.id === id);
+  const subfolders = folders.filter((f) => f.parentId === id);
 
   // Collect distinct tags from all notes in this folder
   const allTags = Array.from(
@@ -112,6 +115,26 @@ export default function Folder() {
 
           {/* Right controls */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0, marginTop: "4px" }}>
+            {/* Add subfolder button */}
+            <button
+              onClick={() => setSubfolderModalOpen(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 12px",
+                borderRadius: "7px",
+                background: "transparent",
+                border: "1px solid var(--border)",
+                color: "var(--text-2)",
+                font: "500 12.5px/1 'Schibsted Grotesk', sans-serif",
+                cursor: "pointer",
+              }}
+            >
+              <Plus size={14} strokeWidth={2} />
+              Add subfolder
+            </button>
+
             {/* Sort button */}
             <button
               style={{
@@ -225,6 +248,71 @@ export default function Folder() {
 
       {/* Note list / grid */}
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 34px 32px" }}>
+        {subfolders.length > 0 && (
+          <div style={{ marginBottom: "24px" }}>
+            <div
+              style={{
+                font: "600 10.5px/1 'Schibsted Grotesk', sans-serif",
+                letterSpacing: ".07em",
+                textTransform: "uppercase",
+                color: "var(--text-3)",
+                marginBottom: "12px",
+              }}
+            >
+              Subfolders
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                gap: "12px",
+              }}
+            >
+              {subfolders.map((sub) => (
+                <Card
+                  key={sub.id}
+                  onClick={() => navigate(`/folder/${sub.id}`)}
+                  style={{
+                    padding: "12px 14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "3px",
+                      background: sub.color,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      flex: 1,
+                      font: "600 13.5px/1.2 'Schibsted Grotesk', sans-serif",
+                      color: "var(--text)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {sub.name}
+                  </span>
+                  <span
+                    style={{
+                      font: "500 11.5px/1 'JetBrains Mono', monospace",
+                      color: "var(--text-3)",
+                    }}
+                  >
+                    {sub.count}
+                  </span>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
         {view === "list" ? (
           <Card style={{ padding: 0, overflow: "hidden" }}>
             {filteredNotes.map((note, idx) => {
@@ -340,6 +428,14 @@ export default function Folder() {
           </div>
         )}
       </div>
+
+      {subfolderModalOpen && (
+        <FolderModal
+          parentId={id}
+          onClose={() => setSubfolderModalOpen(false)}
+          onCreated={(f) => navigate(`/folder/${f.id}`)}
+        />
+      )}
     </AppShell>
   );
 }
