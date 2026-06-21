@@ -9,8 +9,7 @@
     "migrate": "tsx src/db/migrate.ts",
     "db:generate": "drizzle-kit generate",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "seed": "tsx src/db/seed.ts"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@fastify/cookie": "^10.0.0",

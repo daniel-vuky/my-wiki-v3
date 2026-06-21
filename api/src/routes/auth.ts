@@ -6,7 +6,6 @@ import { users, prefs } from "../db/schema.js";
 import { env } from "../env.js";
 import { buildAuthUrl, exchangeCode } from "../auth/google.js";
 import { createSession, destroySession, getSessionUser, COOKIE_NAME, cookieOptions } from "../auth/session.js";
-import { seedUser } from "../db/seed.js";
 
 const redirectUri = () => `${env.PUBLIC_BASE_URL}/api/auth/google/callback`;
 
@@ -42,11 +41,6 @@ export async function authRoutes(app: FastifyInstance) {
         }).returning({ id: users.id });
         userId = row.id;
         await db.insert(prefs).values({ userId }).onConflictDoNothing();
-        try {
-          await seedUser(userId);
-        } catch (err) {
-          console.error("seedUser failed (non-fatal):", err);
-        }
       }
       const token = await createSession(userId);
       reply.setCookie(COOKIE_NAME, token, cookieOptions());
