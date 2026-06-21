@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,18..72,400;0,18..72,500;0,18..72,600;1,18..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  :root, [data-theme="dark"] {
+    --gallery-bg:#0b0c0e; --bg:#111317; --surface:#16181d; --surface-2:#1d2026;
+    --border:#272b33; --border-soft:#1e2229;
+    --text:#e9eaee; --text-2:#a3a7b2; --text-3:#6b6f7a;
+    --accent:#e0a548; --accent-soft:rgba(224,165,72,.15); --accent-text:#f0c074;
+    --code-bg:#0d0f13;
+  }
+  [data-theme="light"] {
+    --gallery-bg:#e9e7e1; --bg:#ffffff; --surface:#faf9f7; --surface-2:#f1efea;
+    --border:#e7e3db; --border-soft:#efece6;
+    --text:#1d1c19; --text-2:#6a6862; --text-3:#9a978e;
+    --accent:#b27c22; --accent-soft:rgba(178,124,34,.12); --accent-text:#8c5f16;
+    --code-bg:#f6f4f0;
+  }
+  [data-accent="teal"]{--accent:#3fa896;--accent-soft:rgba(63,168,150,.15);--accent-text:#5cc4b2;}
+  [data-theme="light"][data-accent="teal"]{--accent:#2c8475;--accent-soft:rgba(44,132,117,.12);--accent-text:#1f6457;}
+  [data-accent="blue"]{--accent:#5b9bd5;--accent-soft:rgba(91,155,213,.15);--accent-text:#7db3e6;}
+  [data-theme="light"][data-accent="blue"]{--accent:#2f6fb0;--accent-soft:rgba(47,111,176,.12);--accent-text:#235488;}
+  [data-accent="rose"]{--accent:#d97a86;--accent-soft:rgba(217,122,134,.15);--accent-text:#e89aa3;}
+  [data-theme="light"][data-accent="rose"]{--accent:#b5505d;--accent-soft:rgba(181,80,93,.12);--accent-text:#8f3a45;}
+  :root{--editor-font:'Newsreader',Georgia,serif;}
+  [data-editorfont="Sans"]{--editor-font:'Schibsted Grotesk',sans-serif;}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  ::selection{background:rgba(91,155,213,.32);}
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" data-accent="{{ accent }}" data-editorfont="{{ editorFont }}" style="width:max-content;min-width:100%;min-height:100vh;box-sizing:border-box;padding:40px 48px 64px;background:var(--gallery-bg);font-family:'Schibsted Grotesk',sans-serif;">
+
+  <div style="display:flex;align-items:center;gap:20px;margin:0 0 36px 4px;">
+    <div style="display:flex;align-items:center;gap:13px;">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#1c1408;font:700 21px/1 'Newsreader',serif;flex:none;">F</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <span style="font:600 21px/1 'Newsreader',serif;color:var(--text);">Folio</span>
+        <span style="font:500 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);">Personal wiki · design exploration — 5 screens</span>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:24px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font:600 11px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);">Accent</span>
+        <button onClick="{{ setAmber }}" style="{{ amberDot }}"></button>
+        <button onClick="{{ setTeal }}" style="{{ tealDot }}"></button>
+        <button onClick="{{ setBlue }}" style="{{ blueDot }}"></button>
+        <button onClick="{{ setRose }}" style="{{ roseDot }}"></button>
+      </div>
+      <div style="display:flex;align-items:center;gap:3px;padding:3px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);">
+        <button onClick="{{ setDark }}" style="{{ darkBtn }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>Dark
+        </button>
+        <button onClick="{{ setLight }}" style="{{ lightBtn }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Light
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:flex-start;gap:48px;">
+
+    <!-- ============ SCREEN 1 — LOGIN ============ -->
+    <div style="flex:none;display:flex;flex-direction:column;">
+      <span style="font:600 12px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);margin:0 0 14px 2px;">01 · Sign in</span>
+      <div style="width:1180px;height:760px;background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.16),0 24px 60px rgba(0,0,0,.18);display:flex;">
+        <div style="flex:1;padding:60px;display:flex;flex-direction:column;justify-content:space-between;background:var(--surface);position:relative;overflow:hidden;border-right:1px solid var(--border);">
+          <div style="position:absolute;inset:0;background-image:radial-gradient(var(--border) 1px,transparent 1px);background-size:24px 24px;opacity:.55;"></div>
+          <div style="position:relative;display:flex;align-items:center;gap:12px;">
+            <div style="width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#1c1408;font:700 19px/1 'Newsreader',serif;">F</div>
+            <span style="font:600 19px/1 'Newsreader',serif;color:var(--text);">Folio</span>
+          </div>
+          <div style="position:relative;">
+            <h1 style="font:600 44px/1.12 'Newsreader',serif;color:var(--text);margin:0 0 18px;max-width:460px;letter-spacing:-.015em;">Your notes, finally in one calm place.</h1>
+            <p style="font:400 17px/1.6 'Newsreader',serif;color:var(--text-2);max-width:410px;margin:0;">Capture what you learn, organize it into folders and tags, and find any thought in seconds.</p>
+            <div style="display:flex;flex-direction:column;gap:15px;margin-top:36px;">
+              <div style="display:flex;align-items:center;gap:13px;"><span style="width:27px;height:27px;border-radius:8px;background:var(--accent-soft);color:var(--accent-text);display:flex;align-items:center;justify-content:center;flex:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12l5 5L20 6"></path></svg></span><span style="font:500 14.5px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text);">A rich editor with slash commands</span></div>
+              <div style="display:flex;align-items:center;gap:13px;"><span style="width:27px;height:27px;border-radius:8px;background:var(--accent-soft);color:var(--accent-text);display:flex;align-items:center;justify-content:center;flex:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12l5 5L20 6"></path></svg></span><span style="font:500 14.5px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text);">Folders, tags &amp; full-text search</span></div>
+              <div style="display:flex;align-items:center;gap:13px;"><span style="width:27px;height:27px;border-radius:8px;background:var(--accent-soft);color:var(--accent-text);display:flex;align-items:center;justify-content:center;flex:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12l5 5L20 6"></path></svg></span><span style="font:500 14.5px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text);">Yours, and private by default</span></div>
+            </div>
+          </div>
+          <div style="position:relative;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">© 2026 Folio</div>
+        </div>
+        <div style="width:480px;flex:none;display:flex;align-items:center;justify-content:center;padding:48px;">
+          <div style="width:100%;max-width:340px;display:flex;flex-direction:column;">
+            <h2 style="font:600 27px/1.2 'Schibsted Grotesk',sans-serif;color:var(--text);margin:0 0 8px;">Sign in</h2>
+            <p style="font:400 15px/1.5 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0 0 32px;">Welcome back. Continue to your workspace.</p>
+            <button style="display:flex;align-items:center;justify-content:center;gap:12px;padding:13px;border-radius:11px;background:#ffffff;border:1px solid #dadce0;color:#1f1f1f;font:600 15px/1 'Schibsted Grotesk',sans-serif;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.1);">
+              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+              Continue with Google
+            </button>
+            <div style="display:flex;align-items:center;gap:14px;margin:22px 0;"><div style="flex:1;height:1px;background:var(--border);"></div><span style="font:500 11px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.06em;color:var(--text-3);">OR</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
+            <button style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:11px;background:transparent;border:1px solid var(--border);color:var(--text);font:600 15px/1 'Schibsted Grotesk',sans-serif;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>Continue with email
+            </button>
+            <p style="font:400 12.5px/1.6 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin:28px 0 0;text-align:center;">By continuing you agree to the <span style="color:var(--text-2);text-decoration:underline;">Terms</span> &amp; <span style="color:var(--text-2);text-decoration:underline;">Privacy Policy</span>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SCREEN 2 — DASHBOARD ============ -->
+    <div style="flex:none;display:flex;flex-direction:column;">
+      <span style="font:600 12px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);margin:0 0 14px 2px;">02 · Home</span>
+      <div style="width:1280px;height:880px;background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.16),0 24px 60px rgba(0,0,0,.18);display:flex;">
+        <dc-import name="Sidebar" active="home" hint-size="260px,100%"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:16px;padding:18px 32px;border-bottom:1px solid var(--border);flex:none;">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <span style="font:600 11px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Wednesday · June 21</span>
+              <h1 style="font:600 23px/1 'Schibsted Grotesk',sans-serif;color:var(--text);margin:0;">Good evening, Alex</h1>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:10px;">
+              <button style="display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9px;background:transparent;border:1px solid var(--border);color:var(--text-2);font:500 13px/1 'Schibsted Grotesk',sans-serif;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 5h18M6 12h12M10 19h4"></path></svg>Filter</button>
+              <button style="display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;background:var(--accent);border:none;color:#1c1408;font:600 13px/1 'Schibsted Grotesk',sans-serif;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"></path></svg>New note</button>
+            </div>
+          </div>
+          <div style="flex:1;padding:28px 32px;overflow:hidden;display:flex;flex-direction:column;gap:30px;">
+            <section>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;"><h2 style="font:600 15px/1 'Schibsted Grotesk',sans-serif;color:var(--text);margin:0;">Continue where you left off</h2><span style="font:500 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--accent-text);cursor:pointer;">View all</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:9px;cursor:pointer;min-height:158px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#e0a548;"></span><span style="font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">Engineering</span></div>
+                  <h3 style="font:600 16px/1.3 'Newsreader',serif;color:var(--text);margin:2px 0 0;">Notes on Distributed Systems</h3>
+                  <p style="font:400 13px/1.5 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;flex:1;">Consensus, replication, and the trade-offs behind keeping nodes in agreement…</p>
+                  <span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">Edited 2h ago</span>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:9px;cursor:pointer;min-height:158px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#4fb3a3;"></span><span style="font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">Reading</span></div>
+                  <h3 style="font:600 16px/1.3 'Newsreader',serif;color:var(--text);margin:2px 0 0;">On Writing Well — highlights</h3>
+                  <p style="font:400 13px/1.5 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;flex:1;">Clutter is the disease of writing. Simplify, simplify — the strongest passages…</p>
+                  <span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">Edited yesterday</span>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:9px;cursor:pointer;min-height:158px;">
+                  <div style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#d98a8a;"></span><span style="font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">Recipes</span></div>
+                  <h3 style="font:600 16px/1.3 'Newsreader',serif;color:var(--text);margin:2px 0 0;">Sourdough: the 70% loaf</h3>
+                  <p style="font:400 13px/1.5 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;flex:1;">Hydration notes, a slower cold proof, and why the crumb finally opened up…</p>
+                  <span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">Edited 3d ago</span>
+                </div>
+              </div>
+            </section>
+            <section>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;"><h2 style="font:600 15px/1 'Schibsted Grotesk',sans-serif;color:var(--text);margin:0;">Folders</h2><span style="font:500 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">6 folders · 76 notes</span></div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:17px;display:flex;flex-direction:column;gap:13px;cursor:pointer;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;"><span style="width:34px;height:34px;border-radius:9px;background:rgba(224,165,72,.16);color:#e0a548;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">24 notes</span></div>
+                  <div><h3 style="font:600 16px/1 'Schibsted Grotesk',sans-serif;color:var(--text);margin:0 0 5px;">Engineering</h3><p style="font:400 12.5px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;">Systems, architecture &amp; infra</p></div>
+                  <div style="display:flex;gap:6px;"><span style="padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#systems</span><span style="padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#python</span></div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:17px;display:flex;flex-direction:column;gap:13px;cursor:pointer;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;"><span style="width:34px;height:34px;border-radius:9px;background:rgba(79,179,163,.16);color:#4fb3a3;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">18 notes</span></div>
+                  <div><h3 style="font:600 16px/1 'Schibsted Grotesk',sans-serif;color:var(--text);margin:0 0 5px;">Reading</h3><p style="font:400 12.5px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;">Books, essays &amp; highlights</p></div>
+                  <div style="display:flex;gap:6px;"><span style="padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#books</span><span style="padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#philosophy</span></div>
+                </div>
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:17px;display:flex;flex-direction:column;gap:13px;cursor:pointer;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;"><span style="width:34px;height:34px;border-radius:9px;background:rgba(168,154,223,.16);color:#a89adf;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"></path></svg></span><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">12 notes</span></div>
+                  <div><h3 style="font:600 16px/1 'Schibsted Grotesk',sans-serif;color:var(--text);margin:0 0 5px;">Ideas</h3><p style="font:400 12.5px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;">Sparks, drafts &amp; half-thoughts</p></div>
+                  <div style="display:flex;gap:6px;"><span style="padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#productivity</span></div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SCREEN 3 — FOLDER VIEW ============ -->
+    <div style="flex:none;display:flex;flex-direction:column;">
+      <span style="font:600 12px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);margin:0 0 14px 2px;">03 · Folder</span>
+      <div style="width:1280px;height:880px;background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.16),0 24px 60px rgba(0,0,0,.18);display:flex;">
+        <dc-import name="Sidebar" active="engineering" hint-size="260px,100%"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:26px 34px 0;flex:none;">
+            <span style="font:500 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">Folders / Engineering</span>
+            <div style="display:flex;align-items:flex-start;gap:14px;margin-top:14px;">
+              <span style="width:14px;height:14px;border-radius:5px;background:#e0a548;margin-top:9px;flex:none;"></span>
+              <div style="flex:1;">
+                <h1 style="font:600 31px/1.1 'Newsreader',serif;color:var(--text);margin:0 0 6px;letter-spacing:-.01em;">Engineering</h1>
+                <p style="font:400 15px/1.5 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;">Systems, architecture &amp; infrastructure notes · 24 notes</p>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button style="display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:9px;background:transparent;border:1px solid var(--border);color:var(--text-2);font:500 12.5px/1 'Schibsted Grotesk',sans-serif;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 7h13M3 12h9M3 17h5M17 6l4 4-4 4"></path></svg>Edited</button>
+                <div style="display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;">
+                  <button style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:var(--surface-2);border:none;color:var(--text);cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></button>
+                  <button style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text-3);cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg></button>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:20px;">
+              <span style="padding:6px 12px;border-radius:8px;background:var(--accent-soft);color:var(--accent-text);font:600 12.5px/1 'Schibsted Grotesk',sans-serif;cursor:pointer;">All</span>
+              <span style="padding:6px 12px;border-radius:8px;background:var(--surface-2);color:var(--text-2);font:500 12.5px/1 'JetBrains Mono',monospace;cursor:pointer;">#systems</span>
+              <span style="padding:6px 12px;border-radius:8px;background:var(--surface-2);color:var(--text-2);font:500 12.5px/1 'JetBrains Mono',monospace;cursor:pointer;">#python</span>
+              <span style="padding:6px 12px;border-radius:8px;background:var(--surface-2);color:var(--text-2);font:500 12.5px/1 'JetBrains Mono',monospace;cursor:pointer;">#postgres</span>
+              <span style="padding:6px 12px;border-radius:8px;background:var(--surface-2);color:var(--text-2);font:500 12.5px/1 'JetBrains Mono',monospace;cursor:pointer;">#design</span>
+            </div>
+          </div>
+          <div style="flex:1;padding:18px 34px 0;overflow:hidden;">
+            <div style="border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);">
+              <div style="display:flex;align-items:center;gap:18px;padding:15px 18px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="flex:1;min-width:0;"><h3 style="font:600 15.5px/1.3 'Newsreader',serif;color:var(--text);margin:0 0 4px;">Notes on Distributed Systems</h3><p style="font:400 13px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;">Consensus algorithms, the CAP theorem in practice, and why timeouts cause most outages.</p></div><div style="display:flex;gap:6px;flex:none;"><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#systems</span><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#distributed</span></div><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);width:78px;text-align:right;flex:none;">2h ago</span></div>
+              <div style="display:flex;align-items:center;gap:18px;padding:15px 18px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="flex:1;min-width:0;"><h3 style="font:600 15.5px/1.3 'Newsreader',serif;color:var(--text);margin:0 0 4px;">Postgres indexing deep-dive</h3><p style="font:400 13px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;">B-tree vs. GIN, partial indexes, and reading EXPLAIN ANALYZE without fear.</p></div><div style="display:flex;gap:6px;flex:none;"><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#postgres</span><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#python</span></div><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);width:78px;text-align:right;flex:none;">Yesterday</span></div>
+              <div style="display:flex;align-items:center;gap:18px;padding:15px 18px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="flex:1;min-width:0;"><h3 style="font:600 15.5px/1.3 'Newsreader',serif;color:var(--text);margin:0 0 4px;">Designing idempotent APIs</h3><p style="font:400 13px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;">Idempotency keys, retries, and making "exactly once" feel possible.</p></div><div style="display:flex;gap:6px;flex:none;"><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#systems</span><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#design</span></div><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);width:78px;text-align:right;flex:none;">2d ago</span></div>
+              <div style="display:flex;align-items:center;gap:18px;padding:15px 18px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="flex:1;min-width:0;"><h3 style="font:600 15.5px/1.3 'Newsreader',serif;color:var(--text);margin:0 0 4px;">Kafka vs. NATS for our pipeline</h3><p style="font:400 13px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;">Throughput, ordering guarantees, and the operational cost of each.</p></div><div style="display:flex;gap:6px;flex:none;"><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#systems</span></div><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);width:78px;text-align:right;flex:none;">4d ago</span></div>
+              <div style="display:flex;align-items:center;gap:18px;padding:15px 18px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="flex:1;min-width:0;"><h3 style="font:600 15.5px/1.3 'Newsreader',serif;color:var(--text);margin:0 0 4px;">Home server setup &amp; backups</h3><p style="font:400 13px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;">ZFS snapshots, off-site sync, and a restore drill that actually works.</p></div><div style="display:flex;gap:6px;flex:none;"><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#infra</span></div><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);width:78px;text-align:right;flex:none;">1w ago</span></div>
+              <div style="display:flex;align-items:center;gap:18px;padding:15px 18px;cursor:pointer;"><div style="flex:1;min-width:0;"><h3 style="font:600 15.5px/1.3 'Newsreader',serif;color:var(--text);margin:0 0 4px;">Rate limiting strategies</h3><p style="font:400 13px/1.4 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;">Token bucket vs. sliding window, and where to enforce them.</p></div><div style="display:flex;gap:6px;flex:none;"><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#systems</span><span style="padding:2px 7px;border-radius:5px;background:var(--bg);color:var(--text-2);font:500 11px/1 'JetBrains Mono',monospace;">#design</span></div><span style="font:500 12px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);width:78px;text-align:right;flex:none;">2w ago</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SCREEN 4 — EDITOR ============ -->
+    <div style="flex:none;display:flex;flex-direction:column;">
+      <span style="font:600 12px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);margin:0 0 14px 2px;">04 · Editor</span>
+      <div style="width:1280px;height:1560px;background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.16),0 24px 60px rgba(0,0,0,.18);display:flex;">
+        <dc-import name="Sidebar" active="engineering" hint-size="260px,100%"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 26px;border-bottom:1px solid var(--border);flex:none;">
+            <div style="display:flex;align-items:center;gap:8px;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);">
+              <span style="width:9px;height:9px;border-radius:50%;background:#e0a548;"></span><span>Engineering</span><span style="display:flex;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"></path></svg></span><span style="color:var(--text-2);">Notes on Distributed Systems</span>
+            </div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+              <span style="font:500 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-right:4px;">Edited 2h ago</span>
+              <button style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);background:transparent;color:var(--text-2);border-radius:8px;cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 2 2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.6 5 20.4l1.4-6.8L1.3 9l6.9-.7z"></path></svg></button>
+              <button style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);background:transparent;color:var(--text-2);border-radius:8px;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle></svg></button>
+              <button style="display:flex;align-items:center;gap:7px;padding:0 13px;height:32px;border:none;background:var(--accent);color:#1c1408;border-radius:8px;cursor:pointer;font:600 13px/1 'Schibsted Grotesk',sans-serif;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"></path><path d="M12 3v13M7 8l5-5 5 5"></path></svg>Share</button>
+            </div>
+          </div>
+          <div style="flex:1;overflow:hidden;display:flex;justify-content:center;">
+            <div style="width:100%;max-width:760px;padding:46px 40px 60px;">
+              <h1 style="font:600 39px/1.14 'Newsreader',serif;color:var(--text);margin:0 0 16px;letter-spacing:-.018em;">Notes on Distributed Systems</h1>
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:32px;">
+                <span style="padding:3px 9px;border-radius:6px;background:var(--surface-2);color:var(--text-2);font:500 11.5px/1 'JetBrains Mono',monospace;">#systems</span>
+                <span style="padding:3px 9px;border-radius:6px;background:var(--surface-2);color:var(--text-2);font:500 11.5px/1 'JetBrains Mono',monospace;">#distributed</span>
+                <span style="font:500 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-left:4px;">Updated June 21, 2026</span>
+              </div>
+
+              <p style="font:400 17px/1.75 var(--editor-font);color:var(--text);margin:0 0 22px;">Working notes on building systems that stay correct when machines, networks, and time refuse to cooperate. Mostly distilled from incidents — and a few good papers.</p>
+
+              <div style="display:flex;gap:12px;padding:15px 17px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;margin:0 0 24px;">
+                <span style="color:var(--accent-text);flex:none;margin-top:1px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h0"></path></svg></span>
+                <p style="font:400 15px/1.6 var(--editor-font);color:var(--text);margin:0;">Most "consensus" bugs in production aren't algorithmic — they're timeout and retry logic interacting badly under partial failure.</p>
+              </div>
+
+              <h2 style="font:600 25px/1.25 'Newsreader',serif;color:var(--text);margin:34px 0 14px;letter-spacing:-.01em;">Consensus &amp; replication</h2>
+              <p style="position:relative;font:400 17px/1.75 var(--editor-font);color:var(--text);margin:0 0 22px;">At its core, <span style="background:rgba(91,155,213,.32);border-radius:2px;">consensus is the problem of getting a distributed set of nodes to agree on a single value</span>, even when some of them fail. The hard part isn't agreement — it's agreement under uncertainty about who is still alive.
+                <span style="position:absolute;top:34px;left:8px;display:flex;align-items:center;gap:1px;padding:5px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.32);white-space:nowrap;z-index:5;">
+                  <button style="width:30px;height:30px;border:none;background:transparent;color:var(--text);border-radius:6px;cursor:pointer;font:700 14px/1 'Newsreader',serif;">B</button>
+                  <button style="width:30px;height:30px;border:none;background:transparent;color:var(--text);border-radius:6px;cursor:pointer;font:italic 600 14px/1 'Newsreader',serif;">i</button>
+                  <button style="width:30px;height:30px;border:none;background:transparent;color:var(--text);border-radius:6px;cursor:pointer;font:600 13px/1 'Schibsted Grotesk',sans-serif;text-decoration:underline;">U</button>
+                  <span style="width:1px;height:18px;background:var(--border);margin:0 3px;"></span>
+                  <button style="width:30px;height:30px;border:none;background:transparent;color:var(--text);border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"></path></svg></button>
+                  <button style="width:30px;height:30px;border:none;background:transparent;color:var(--text);border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font:500 13px/1 'JetBrains Mono',monospace;">&lt;&gt;</button>
+                  <button style="width:30px;height:30px;border:none;background:var(--accent-soft);color:var(--accent-text);border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
+                  <span style="width:1px;height:18px;background:var(--border);margin:0 3px;"></span>
+                  <button style="height:30px;padding:0 8px;border:none;background:transparent;color:var(--text);border-radius:6px;cursor:pointer;font:600 13px/1 'Schibsted Grotesk',sans-serif;">H2</button>
+                </span>
+              </p>
+
+              <div style="background:var(--code-bg);border:1px solid var(--border);border-radius:10px;margin:0 0 24px;overflow:hidden;">
+                <div style="display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);"><span style="font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--text-3);">leader_election.py</span><span style="margin-left:auto;font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--text-3);cursor:pointer;">Copy</span></div>
+                <pre style="margin:0;padding:16px;overflow:auto;font:400 13px/1.75 'JetBrains Mono',monospace;color:var(--text);"><span style="color:var(--text-3);"># quorum: a strict majority must agree</span>
+<span style="color:var(--accent-text);">def</span> elect_leader(nodes):
+    quorum = <span style="color:var(--accent-text);">len</span>(nodes) // <span style="color:#7cba6a;">2</span> + <span style="color:#7cba6a;">1</span>
+    votes  = gather_votes(nodes)
+    <span style="color:var(--accent-text);">return</span> votes &gt;= quorum</pre>
+              </div>
+
+              <h2 style="font:600 25px/1.25 'Newsreader',serif;color:var(--text);margin:34px 0 14px;letter-spacing:-.01em;">Pre-flight for a new service</h2>
+              <div style="display:flex;flex-direction:column;gap:11px;margin:0 0 24px;">
+                <div style="display:flex;align-items:center;gap:11px;"><span style="width:18px;height:18px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;color:#1c1408;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="M5 12l5 5L20 6"></path></svg></span><span style="font:400 16px/1.4 var(--editor-font);color:var(--text-3);text-decoration:line-through;">Define the failure model</span></div>
+                <div style="display:flex;align-items:center;gap:11px;"><span style="width:18px;height:18px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;color:#1c1408;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4"><path d="M5 12l5 5L20 6"></path></svg></span><span style="font:400 16px/1.4 var(--editor-font);color:var(--text-3);text-decoration:line-through;">Pick a consistency level per endpoint</span></div>
+                <div style="display:flex;align-items:center;gap:11px;"><span style="width:18px;height:18px;border-radius:5px;border:1.6px solid var(--text-3);flex:none;"></span><span style="font:400 16px/1.4 var(--editor-font);color:var(--text);">Add chaos tests for partition scenarios</span></div>
+              </div>
+
+              <h2 style="font:600 25px/1.25 'Newsreader',serif;color:var(--text);margin:34px 0 14px;letter-spacing:-.01em;">Trade-offs at a glance</h2>
+              <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:0 0 24px;">
+                <table style="width:100%;border-collapse:collapse;font:400 14px/1.4 'Schibsted Grotesk',sans-serif;">
+                  <thead><tr style="background:var(--surface);"><th style="text-align:left;padding:11px 15px;font:600 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);border-bottom:1px solid var(--border);">Approach</th><th style="text-align:left;padding:11px 15px;font:600 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);border-bottom:1px solid var(--border);">Consistency</th><th style="text-align:left;padding:11px 15px;font:600 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);border-bottom:1px solid var(--border);">Latency</th></tr></thead>
+                  <tbody>
+                    <tr><td style="padding:11px 15px;color:var(--text);border-bottom:1px solid var(--border-soft);">Single leader</td><td style="padding:11px 15px;color:var(--text-2);border-bottom:1px solid var(--border-soft);">Strong</td><td style="padding:11px 15px;color:var(--text-2);border-bottom:1px solid var(--border-soft);">Higher</td></tr>
+                    <tr><td style="padding:11px 15px;color:var(--text);border-bottom:1px solid var(--border-soft);">Quorum (R+W&gt;N)</td><td style="padding:11px 15px;color:var(--text-2);border-bottom:1px solid var(--border-soft);">Tunable</td><td style="padding:11px 15px;color:var(--text-2);border-bottom:1px solid var(--border-soft);">Medium</td></tr>
+                    <tr><td style="padding:11px 15px;color:var(--text);">Leaderless</td><td style="padding:11px 15px;color:var(--text-2);">Eventual</td><td style="padding:11px 15px;color:var(--text-2);">Lower</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <figure style="margin:0 0 24px;">
+                <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface);height:210px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="300" height="150" viewBox="0 0 300 150" fill="none">
+                    <line x1="80" y1="50" x2="150" y2="108" stroke="var(--text-3)" stroke-width="1.5"></line>
+                    <line x1="220" y1="50" x2="150" y2="108" stroke="var(--text-3)" stroke-width="1.5"></line>
+                    <line x1="80" y1="50" x2="220" y2="50" stroke="var(--text-3)" stroke-width="1.5" stroke-dasharray="4 4"></line>
+                    <circle cx="80" cy="50" r="22" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"></circle>
+                    <circle cx="220" cy="50" r="22" fill="var(--bg)" stroke="var(--text-3)" stroke-width="2"></circle>
+                    <circle cx="150" cy="108" r="22" fill="var(--bg)" stroke="var(--text-3)" stroke-width="2"></circle>
+                    <text x="80" y="54" text-anchor="middle" fill="var(--accent-text)" font-family="JetBrains Mono" font-size="11">n1</text>
+                    <text x="220" y="54" text-anchor="middle" fill="var(--text-2)" font-family="JetBrains Mono" font-size="11">n2</text>
+                    <text x="150" y="112" text-anchor="middle" fill="var(--text-2)" font-family="JetBrains Mono" font-size="11">n3</text>
+                  </svg>
+                </div>
+                <figcaption style="font:400 13px/1.5 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-top:9px;text-align:center;">System topology — n1 holds the lease in a three-node quorum</figcaption>
+              </figure>
+
+              <div style="position:relative;min-height:340px;">
+                <div style="font:400 17px/1.75 var(--editor-font);color:var(--text-3);">/<span style="color:var(--text);">head</span><span style="display:inline-block;width:2px;height:20px;background:var(--accent);margin-left:1px;vertical-align:-4px;animation:blink 1.1s steps(1) infinite;"></span></div>
+                <div style="position:absolute;top:36px;left:0;width:312px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;box-shadow:0 18px 48px rgba(0,0,0,.36);padding:7px;z-index:6;">
+                  <div style="font:600 10.5px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);padding:8px 10px 6px;">Basic blocks</div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;background:var(--accent-soft);"><span style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text);font:600 15px/1 'Newsreader',serif;flex:none;">H1</span><div><div style="font:600 13.5px/1.2 'Schibsted Grotesk',sans-serif;color:var(--text);">Heading 1</div><div style="font:400 12px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-top:2px;">Big section heading</div></div></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;"><span style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);font:600 13px/1 'Newsreader',serif;flex:none;">H2</span><div><div style="font:600 13.5px/1.2 'Schibsted Grotesk',sans-serif;color:var(--text);">Heading 2</div><div style="font:400 12px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-top:2px;">Medium section heading</div></div></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;"><span style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);flex:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5" width="6" height="6" rx="1"></rect><path d="M4 7l1.5 1.5L8 6M13 7h8M13 17h8M4 17h5"></path></svg></span><div><div style="font:600 13.5px/1.2 'Schibsted Grotesk',sans-serif;color:var(--text);">To-do list</div><div style="font:400 12px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-top:2px;">Track tasks with checkboxes</div></div></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;"><span style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);font:500 12px/1 'JetBrains Mono',monospace;flex:none;">&lt;&gt;</span><div><div style="font:600 13.5px/1.2 'Schibsted Grotesk',sans-serif;color:var(--text);">Code block</div><div style="font:400 12px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-top:2px;">Capture a snippet</div></div></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:8px;"><span style="width:32px;height:32px;border-radius:7px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-2);flex:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h0"></path></svg></span><div><div style="font:600 13.5px/1.2 'Schibsted Grotesk',sans-serif;color:var(--text);">Callout</div><div style="font:400 12px/1.3 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-top:2px;">Make a note stand out</div></div></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SCREEN 5 — SEARCH ============ -->
+    <div style="flex:none;display:flex;flex-direction:column;">
+      <span style="font:600 12px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);margin:0 0 14px 2px;">05 · Search</span>
+      <div style="width:1280px;height:880px;background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.16),0 24px 60px rgba(0,0,0,.18);display:flex;">
+        <dc-import name="Sidebar" active="search" hint-size="260px,100%"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:24px 32px;border-bottom:1px solid var(--border);flex:none;">
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);box-shadow:0 0 0 3px var(--accent-soft);">
+              <span style="color:var(--accent-text);display:flex;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.4-3.4"></path></svg></span>
+              <span style="flex:1;font:500 17px/1.2 'Schibsted Grotesk',sans-serif;color:var(--text);">distributed systems<span style="display:inline-block;width:2px;height:18px;background:var(--accent);margin-left:1px;vertical-align:-3px;animation:blink 1.1s steps(1) infinite;"></span></span>
+              <span style="font:500 11px/1 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;background:var(--surface-2);color:var(--text-3);">esc</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;margin-top:16px;">
+              <span style="font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);margin-right:2px;">12 results</span>
+              <span style="padding:5px 11px;border-radius:7px;background:var(--accent-soft);color:var(--accent-text);font:600 12px/1 'Schibsted Grotesk',sans-serif;cursor:pointer;">All folders</span>
+              <span style="padding:5px 11px;border-radius:7px;background:var(--surface-2);color:var(--text-2);font:500 12px/1 'JetBrains Mono',monospace;cursor:pointer;">#systems</span>
+              <span style="padding:5px 11px;border-radius:7px;background:var(--surface-2);color:var(--text-2);font:500 12px/1 'JetBrains Mono',monospace;cursor:pointer;">#distributed</span>
+              <span style="margin-left:auto;font:500 12.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);cursor:pointer;display:flex;align-items:center;gap:6px;">Relevance<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg></span>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;overflow:hidden;">
+            <div style="width:210px;flex:none;border-right:1px solid var(--border);padding:22px;display:flex;flex-direction:column;gap:24px;">
+              <div>
+                <div style="font:600 10.5px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;">Type</div>
+                <div style="display:flex;flex-direction:column;gap:9px;">
+                  <div style="display:flex;align-items:center;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text);"><span>Notes</span><span style="margin-left:auto;color:var(--text-3);font:500 12px/1 'JetBrains Mono',monospace;">9</span></div>
+                  <div style="display:flex;align-items:center;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);"><span>Tasks</span><span style="margin-left:auto;color:var(--text-3);font:500 12px/1 'JetBrains Mono',monospace;">2</span></div>
+                  <div style="display:flex;align-items:center;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);"><span>Files</span><span style="margin-left:auto;color:var(--text-3);font:500 12px/1 'JetBrains Mono',monospace;">1</span></div>
+                </div>
+              </div>
+              <div>
+                <div style="font:600 10.5px/1 'Schibsted Grotesk',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px;">Folder</div>
+                <div style="display:flex;flex-direction:column;gap:9px;">
+                  <div style="display:flex;align-items:center;gap:8px;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text);"><span style="width:8px;height:8px;border-radius:50%;background:#e0a548;"></span><span>Engineering</span><span style="margin-left:auto;color:var(--text-3);font:500 12px/1 'JetBrains Mono',monospace;">7</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);"><span style="width:8px;height:8px;border-radius:50%;background:#4fb3a3;"></span><span>Reading</span><span style="margin-left:auto;color:var(--text-3);font:500 12px/1 'JetBrains Mono',monospace;">3</span></div>
+                  <div style="display:flex;align-items:center;gap:8px;font:500 13px/1 'Schibsted Grotesk',sans-serif;color:var(--text-2);"><span style="width:8px;height:8px;border-radius:50%;background:#a89adf;"></span><span>Ideas</span><span style="margin-left:auto;color:var(--text-3);font:500 12px/1 'JetBrains Mono',monospace;">2</span></div>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1;padding:8px 28px;overflow:hidden;">
+              <div style="padding:18px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#e0a548;"></span><span>Engineering</span><span>· 2h ago</span></div><h3 style="font:600 17px/1.3 'Newsreader',serif;color:var(--text);margin:6px 0 6px;">Notes on <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">Distributed Systems</mark></h3><p style="font:400 14px/1.6 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;max-width:680px;">…consensus in <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">distributed</mark> <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">systems</mark> requires agreement under uncertainty about who is still alive…</p></div>
+              <div style="padding:18px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#e0a548;"></span><span>Engineering</span><span>· 4d ago</span></div><h3 style="font:600 17px/1.3 'Newsreader',serif;color:var(--text);margin:6px 0 6px;">Kafka vs. NATS for our pipeline</h3><p style="font:400 14px/1.6 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;max-width:680px;">…ordering guarantees matter most in <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">distributed</mark> message pipelines where replays are common…</p></div>
+              <div style="padding:18px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#4fb3a3;"></span><span>Reading</span><span>· 3w ago</span></div><h3 style="font:600 17px/1.3 'Newsreader',serif;color:var(--text);margin:6px 0 6px;">Notes from "Designing Data-Intensive Apps"</h3><p style="font:400 14px/1.6 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;max-width:680px;">…the canonical reference for <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">distributed</mark> <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">systems</mark> — partitioning, replication and consensus…</p></div>
+              <div style="padding:18px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#e0a548;"></span><span>Engineering</span><span>· 2d ago</span></div><h3 style="font:600 17px/1.3 'Newsreader',serif;color:var(--text);margin:6px 0 6px;">Designing idempotent APIs</h3><p style="font:400 14px/1.6 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;max-width:680px;">…retry-safety is a prerequisite for any reliable <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">system</mark> with at-least-once delivery…</p></div>
+              <div style="padding:18px 4px;cursor:pointer;"><div style="display:flex;align-items:center;gap:7px;font:500 11.5px/1 'Schibsted Grotesk',sans-serif;color:var(--text-3);"><span style="width:8px;height:8px;border-radius:50%;background:#a89adf;"></span><span>Ideas</span><span>· 5w ago</span></div><h3 style="font:600 17px/1.3 'Newsreader',serif;color:var(--text);margin:6px 0 6px;">A weekend project: tiny Raft</h3><p style="font:400 14px/1.6 'Schibsted Grotesk',sans-serif;color:var(--text-2);margin:0;max-width:680px;">…implement leader election from scratch to really understand <mark style="background:var(--accent-soft);color:var(--accent-text);padding:0 2px;border-radius:3px;">distributed</mark> consensus…</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;dark&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;amber&quot;,&quot;options&quot;:[&quot;amber&quot;,&quot;teal&quot;,&quot;blue&quot;,&quot;rose&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;editorFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Serif&quot;,&quot;options&quot;:[&quot;Serif&quot;,&quot;Sans&quot;],&quot;tsType&quot;:&quot;'Serif'|'Sans'&quot;}}">
+class Component extends DCLogic {
+  state = {
+    theme: (this.props && this.props.theme) || 'dark',
+    accent: (this.props && this.props.accent) || 'amber',
+    editorFont: (this.props && this.props.editorFont) || 'Serif',
+  };
+  componentDidUpdate(prev) {
+    const u = {};
+    if (this.props.theme && this.props.theme !== prev.props.theme) u.theme = this.props.theme;
+    if (this.props.accent && this.props.accent !== prev.props.accent) u.accent = this.props.accent;
+    if (this.props.editorFont && this.props.editorFont !== prev.props.editorFont) u.editorFont = this.props.editorFont;
+    if (Object.keys(u).length) this.setState(u);
+  }
+  renderVals() {
+    const { theme, accent, editorFont } = this.state;
+    const seg = "display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:8px;border:none;cursor:pointer;font:600 13px/1 'Schibsted Grotesk',sans-serif;transition:all .15s;";
+    const segOn = seg + "background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.25);";
+    const segOff = seg + "background:transparent;color:var(--text-2);";
+    const dot = (c, name) => "width:22px;height:22px;border-radius:50%;background:" + c + ";border:none;cursor:pointer;padding:0;outline:" + (accent === name ? "2px solid var(--text)" : "2px solid transparent") + ";outline-offset:2px;transition:outline-color .15s;";
+    return {
+      theme, accent, editorFont,
+      setDark: () => this.setState({ theme: 'dark' }),
+      setLight: () => this.setState({ theme: 'light' }),
+      setAmber: () => this.setState({ accent: 'amber' }),
+      setTeal: () => this.setState({ accent: 'teal' }),
+      setBlue: () => this.setState({ accent: 'blue' }),
+      setRose: () => this.setState({ accent: 'rose' }),
+      darkBtn: theme === 'dark' ? segOn : segOff,
+      lightBtn: theme === 'light' ? segOn : segOff,
+      amberDot: dot('#e0a548', 'amber'),
+      tealDot: dot('#4fb3a3', 'teal'),
+      blueDot: dot('#6fa8dc', 'blue'),
+      roseDot: dot('#d98a8a', 'rose'),
+    };
+  }
+}
+</script>
+</body>
+</html>
