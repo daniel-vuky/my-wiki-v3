@@ -349,13 +349,13 @@ export default function Search() {
               )}
             </aside>
 
-            {/* RESULTS list */}
+            {/* RESULTS grid */}
             <div
               className="folio-search"
               style={{
                 flex: 1,
                 overflowY: "auto",
-                padding: "8px 28px",
+                padding: "20px 28px 32px",
               }}
             >
               {results.length === 0 && !isFetching ? (
@@ -370,15 +370,22 @@ export default function Search() {
                   No results for "{debouncedQuery}"
                 </div>
               ) : (
-                results.map((result, idx) => (
-                  <ResultRow
-                    key={result.id}
-                    result={result}
-                    folder={result.folderId ? folderMap.get(result.folderId) : undefined}
-                    isLast={idx === results.length - 1}
-                    onClick={() => navigate(`/note/${result.id}`)}
-                  />
-                ))
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                    gap: "18px",
+                  }}
+                >
+                  {results.map((result) => (
+                    <ResultCard
+                      key={result.id}
+                      result={result}
+                      folder={result.folderId ? folderMap.get(result.folderId) : undefined}
+                      onClick={() => navigate(`/note/${result.id}`)}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -388,14 +395,13 @@ export default function Search() {
   );
 }
 
-interface ResultRowProps {
+interface ResultCardProps {
   result: SearchResult;
   folder: Folder | undefined;
-  isLast: boolean;
   onClick: () => void;
 }
 
-function ResultRow({ result, folder, isLast, onClick }: ResultRowProps) {
+function ResultCard({ result, folder, onClick }: ResultCardProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -404,12 +410,16 @@ function ResultRow({ result, folder, isLast, onClick }: ResultRowProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        padding: hovered ? "16px 12px" : "16px 0",
-        borderBottom: isLast ? "none" : "1px solid var(--border-soft)",
+        background: hovered ? "var(--surface-2)" : "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: "12px",
+        padding: "18px",
+        minHeight: "150px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
         cursor: "pointer",
-        background: hovered ? "var(--surface-2)" : "transparent",
-        borderRadius: hovered ? "8px" : "0",
-        transition: "background .1s",
+        transition: "background .15s",
       }}
     >
       {/* Meta line: folder dot + folder name + · + relativeTime */}
@@ -418,7 +428,6 @@ function ResultRow({ result, folder, isLast, onClick }: ResultRowProps) {
           display: "flex",
           alignItems: "center",
           gap: "6px",
-          marginBottom: "5px",
         }}
       >
         {folder && (
@@ -460,7 +469,7 @@ function ResultRow({ result, folder, isLast, onClick }: ResultRowProps) {
         style={{
           font: "600 17px/1.35 'Newsreader', serif",
           color: "var(--text)",
-          marginBottom: "5px",
+          flex: 1,
         }}
       />
 
@@ -469,9 +478,12 @@ function ResultRow({ result, folder, isLast, onClick }: ResultRowProps) {
         <div
           dangerouslySetInnerHTML={{ __html: result.snippetHl }}
           style={{
-            font: "400 13.5px/1.55 'Schibsted Grotesk', sans-serif",
+            font: "400 13px/1.5 'Schibsted Grotesk', sans-serif",
             color: "var(--text-2)",
-            maxWidth: "680px",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         />
       )}

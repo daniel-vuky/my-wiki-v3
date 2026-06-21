@@ -1,17 +1,10 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "../components/AppShell";
-import { Card } from "../components/ui/Card";
-import { Chip } from "../components/ui/Chip";
+import { NoteCard } from "../components/NoteCard";
 import { api } from "../api/client";
-import { relativeTime } from "../lib/time";
-import { extractSnippet } from "../lib/snippet";
 import type { Note } from "../types";
 
 export default function AllNotes() {
-  const navigate = useNavigate();
-
   const { data: notes = [], isLoading } = useQuery<Note[]>({
     queryKey: ["notes", "all"],
     queryFn: () => api.notes(),
@@ -53,114 +46,33 @@ export default function AllNotes() {
         )}
       </div>
 
-      {/* Note list */}
+      {/* Note grid */}
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 34px 32px" }}>
-        <Card style={{ padding: 0, overflow: "hidden" }}>
-          {sorted.map((note, idx) => {
-            const snippet = extractSnippet(note.content);
-            const isLast = idx === sorted.length - 1;
-            return (
-              <NoteRow
-                key={note.id}
-                note={note}
-                snippet={snippet}
-                isLast={isLast}
-                onClick={() => navigate(`/note/${note.id}`)}
-              />
-            );
-          })}
-          {sorted.length === 0 && !isLoading && (
-            <div
-              style={{
-                padding: "40px 32px",
-                textAlign: "center",
-                color: "var(--text-3)",
-                font: "400 13px/1 'Schibsted Grotesk', sans-serif",
-              }}
-            >
-              No notes yet
-            </div>
-          )}
-        </Card>
-      </div>
-    </AppShell>
-  );
-}
-
-interface NoteRowProps {
-  note: Note;
-  snippet: string;
-  isLast: boolean;
-  onClick: () => void;
-}
-
-function NoteRow({ note, snippet, isLast, onClick }: NoteRowProps) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "18px",
-        padding: "15px 18px",
-        borderBottom: isLast ? "none" : "1px solid var(--border-soft)",
-        cursor: "pointer",
-        background: hovered ? "var(--surface-2)" : "transparent",
-        transition: "background .12s",
-      }}
-    >
-      {/* Title + snippet */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            font: "600 15.5px/1.3 'Newsreader', serif",
-            color: "var(--text)",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {note.title || "Untitled"}
-        </div>
-        {snippet && (
+        {sorted.length === 0 && !isLoading ? (
           <div
             style={{
+              padding: "40px 32px",
+              textAlign: "center",
+              color: "var(--text-3)",
               font: "400 13px/1 'Schibsted Grotesk', sans-serif",
-              color: "var(--text-2)",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              marginTop: "4px",
             }}
           >
-            {snippet}
+            No notes yet
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: "18px",
+            }}
+          >
+            {sorted.map((note) => (
+              <NoteCard key={note.id} note={note} />
+            ))}
           </div>
         )}
       </div>
-
-      {/* Tags */}
-      <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
-        {note.tags.slice(0, 2).map((tag) => (
-          <Chip key={tag}>{tag}</Chip>
-        ))}
-      </div>
-
-      {/* Time */}
-      <div
-        style={{
-          width: "78px",
-          textAlign: "right",
-          font: "500 12px/1 'Schibsted Grotesk', sans-serif",
-          color: "var(--text-3)",
-          flexShrink: 0,
-        }}
-      >
-        {relativeTime(note.updatedAt)}
-      </div>
-    </div>
+    </AppShell>
   );
 }
