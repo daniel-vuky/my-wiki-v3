@@ -1,6 +1,6 @@
 import type { User, Prefs, Folder, Note, TagCount, SearchResponse } from "../types";
 
-async function req<T>(url: string, init: RequestInit = {}): Promise<T> {
+async function req<T>(url: string, init: RequestInit = {}, opts: { redirectOn401?: boolean } = {}): Promise<T> {
   // Only send a JSON content-type when there's actually a body. Sending
   // `Content-Type: application/json` with an empty body makes Fastify reject
   // the request with 400 at the parsing stage (before auth) — which breaks
@@ -8,7 +8,16 @@ async function req<T>(url: string, init: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = { ...(init.headers as Record<string, string>) };
   if (init.body != null) headers["Content-Type"] = "application/json";
   const res = await fetch(url, { credentials: "include", ...init, headers });
-  if (res.status === 401) { window.location.href = "/signin"; throw new Error("unauthorized"); }
+  if (res.status === 401) {
+    // A 401 on a data call after the session expired sends the user to sign-in.
+    // BUT never do a hard redirect during the `me` auth-check (logged-out is
+    // expected — the router Guard handles that client-side) and never when
+    // already on /signin, otherwise the page reloads in an infinite loop.
+    if (opts.redirectOn401 !== false && !window.location.pathname.startsWith("/signin")) {
+      window.location.href = "/signin";
+    }
+    throw new Error("unauthorized");
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({} as any));
     throw new Error(body?.error?.message ?? res.statusText);
@@ -17,7 +26,7 @@ async function req<T>(url: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  me: () => req<{ user: User; prefs: Prefs }>("/api/auth/me"),
+  me: () => req<{ user: User; prefs: Prefs }>("/api/auth/me", {}, { redirectOn401: false }),
   logout: () => req("/api/auth/logout", { method: "POST" }),
   folders: () => req<Folder[]>("/api/folders"),
   createFolder: (b: { name: string; color: string; description?: string; parentId?: string | null }) => req<Folder>("/api/folders", { method: "POST", body: JSON.stringify(b) }),
