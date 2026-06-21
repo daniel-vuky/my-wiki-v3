@@ -38,6 +38,7 @@ export const notes = pgTable("notes", {
   title: text("title").default("Untitled").notNull(),
   content: text("content").default("[]").notNull(),
   plaintext: text("plaintext").default("").notNull(),
+  tagsText: text("tags_text").default("").notNull(),
   favorite: boolean("favorite").default(false).notNull(),
   searchVector: tsvector("search_vector"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { redis } from "../cache/redis.js";
+import { env } from "../env.js";
 
 const TTL_SEC = 60 * 60 * 24 * 30; // 30 days
 export const COOKIE_NAME = "folio_session";
@@ -26,5 +27,6 @@ export async function destroySession(token: string | undefined): Promise<void> {
   if (token) await redis.del(sessionRedisKey(token));
 }
 export function cookieOptions() {
-  return { httpOnly: true, secure: true, sameSite: "lax" as const, path: "/", maxAge: TTL_SEC };
+  const secure = (env.PUBLIC_BASE_URL ?? "").startsWith("https");
+  return { httpOnly: true, secure, sameSite: "lax" as const, path: "/", maxAge: TTL_SEC };
 }

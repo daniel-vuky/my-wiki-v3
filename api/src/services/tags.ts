@@ -1,6 +1,6 @@
 import { and, eq, count } from "drizzle-orm";
 import { db } from "../db/client.js";
-import { tags, noteTags } from "../db/schema.js";
+import { tags, noteTags, notes } from "../db/schema.js";
 
 export async function ensureTags(userId: string, names: string[]): Promise<string[]> {
   const ids: string[] = [];
@@ -19,6 +19,7 @@ export async function setNoteTags(userId: string, noteId: string, names: string[
   await db.delete(noteTags).where(eq(noteTags.noteId, noteId));
   const ids = await ensureTags(userId, names);
   if (ids.length) await db.insert(noteTags).values(ids.map((tagId) => ({ noteId, tagId })));
+  await db.update(notes).set({ tagsText: names.join(" ") }).where(and(eq(notes.id, noteId), eq(notes.userId, userId)));
 }
 
 export async function listTags(userId: string) {

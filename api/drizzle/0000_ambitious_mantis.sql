@@ -127,8 +127,8 @@ BEGIN
   RETURN NEW;
 END
 $$ LANGUAGE plpgsql;
-
+--> statement-breakpoint
 CREATE TRIGGER notes_search_vector_trg BEFORE INSERT OR UPDATE OF title, plaintext
   ON notes FOR EACH ROW EXECUTE FUNCTION notes_search_vector_update();
-
+--> statement-breakpoint
 CREATE INDEX notes_search_idx ON notes USING GIN (search_vector);

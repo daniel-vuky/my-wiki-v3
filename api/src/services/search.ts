@@ -6,8 +6,10 @@ export interface SearchResult {
   titleHl: string; snippetHl: string; rank: number;
 }
 
+export interface FolderFacet { folderId: string | null; c: number }
+
 export async function searchNotes(userId: string, q: string, opts: { folderId?: string } = {}) {
-  if (!q.trim()) return { results: [] as SearchResult[], folderFacets: [] as { folderId: string | null; c: number }[] };
+  if (!q.trim()) return { results: [] as SearchResult[], folderFacets: [] as FolderFacet[] };
   const folderFilter = opts.folderId ? sql`AND folder_id = ${opts.folderId}` : sql``;
   const rows = await db.execute(sql`
     SELECT id, title, folder_id AS "folderId", updated_at AS "updatedAt",
@@ -26,5 +28,5 @@ export async function searchNotes(userId: string, q: string, opts: { folderId?: 
     WHERE user_id = ${userId} AND search_vector @@ websearch_to_tsquery('english', ${q})
     GROUP BY folder_id
   `);
-  return { results: rows.rows as unknown as SearchResult[], folderFacets: facets.rows as any };
+  return { results: rows.rows as unknown as SearchResult[], folderFacets: facets.rows as unknown as FolderFacet[] };
 }

@@ -9,13 +9,37 @@ export async function folderRoutes(app: FastifyInstance) {
   app.get("/api/folders", async (req) =>
     cached(cacheKey("folders", req.userId!), 60, () => listFolders(req.userId!)));
 
-  app.post("/api/folders", async (req) => {
+  app.post("/api/folders", {
+    schema: {
+      body: {
+        type: "object",
+        required: ["name", "color"],
+        properties: {
+          name: { type: "string", minLength: 1 },
+          color: { type: "string" },
+          description: { type: "string" },
+        },
+      },
+    },
+  }, async (req) => {
     const row = await createFolder(req.userId!, req.body as any);
     await invalidate(`folders:${req.userId}*`);
     return row;
   });
 
-  app.patch("/api/folders/:id", async (req) => {
+  app.patch("/api/folders/:id", {
+    schema: {
+      body: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          color: { type: "string" },
+          description: { type: "string" },
+          sortOrder: { type: "number" },
+        },
+      },
+    },
+  }, async (req) => {
     const row = await updateFolder(req.userId!, (req.params as any).id, req.body as any);
     await invalidate(`folders:${req.userId}*`);
     return row;
