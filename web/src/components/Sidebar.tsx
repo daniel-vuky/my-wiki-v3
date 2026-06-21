@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Plus, ChevronDown, ChevronRight, Star, SlidersHorizontal } from "lucide-react";
+import { Search, Plus, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../state/AuthContext";
 import { Kbd } from "./ui/Kbd";
 import { Avatar } from "./ui/Avatar";
 import { SettingsPopover } from "./SettingsPopover";
-import { FolderModal } from "./FolderModal";
 import type { Folder, Note, TagCount } from "../types";
 
 const NAV_BASE: React.CSSProperties = {
@@ -63,8 +62,6 @@ export function Sidebar() {
   const params = useParams<{ id?: string }>();
   const queryClient = useQueryClient();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [folderModalOpen, setFolderModalOpen] = useState(false);
-  const [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(new Set());
 
   const { data: folders = [] } = useQuery<Folder[]>({
     queryKey: ["folders"],
@@ -76,7 +73,7 @@ export function Sidebar() {
     queryFn: api.tags,
   });
 
-  const { data: favorites = [] } = useQuery<Note[]>({
+  const { data: favoritePosts = [] } = useQuery<Note[]>({
     queryKey: ["notes", "favorites"],
     queryFn: () => api.notes({ favorite: true }),
   });
@@ -90,16 +87,8 @@ export function Sidebar() {
     },
   });
 
+  const favoriteFolders = folders.filter((f) => f.favorite);
   const workspaceName = user ? `${user.name.split(" ")[0]}'s workspace` : "Workspace";
-
-  function toggleFolder(fid: string) {
-    setCollapsedFolders((prev) => {
-      const next = new Set(prev);
-      if (next.has(fid)) next.delete(fid);
-      else next.add(fid);
-      return next;
-    });
-  }
 
   return (
     <aside
@@ -226,7 +215,7 @@ export function Sidebar() {
 
       {/* Overflow scrollable area */}
       <div style={{ flex: 1, overflow: "auto", minHeight: 0 }}>
-        {/* Favorites section */}
+        {/* Favourite posts section */}
         <div
           style={{
             font: "600 10.5px/1 'Schibsted Grotesk', sans-serif",
@@ -236,9 +225,9 @@ export function Sidebar() {
             padding: "4px 10px 6px",
           }}
         >
-          Favorites
+          Favourite posts
         </div>
-        {favorites.map((note) => (
+        {favoritePosts.map((note) => (
           <NavRow key={note.id} onClick={() => navigate(`/note/${note.id}`)}>
             <span style={{ color: "var(--accent-text)", display: "flex", flexShrink: 0 }}>
               <Star size={13} fill="currentColor" />
@@ -256,7 +245,7 @@ export function Sidebar() {
           </NavRow>
         ))}
 
-        {/* Folders section */}
+        {/* Favourite folders section */}
         <div
           style={{
             font: "600 10.5px/1 'Schibsted Grotesk', sans-serif",
@@ -264,44 +253,60 @@ export function Sidebar() {
             textTransform: "uppercase",
             color: "var(--text-3)",
             padding: "16px 10px 6px",
-            display: "flex",
-            alignItems: "center",
           }}
         >
-          Folders
-          <button
-            onClick={() => setFolderModalOpen(true)}
-            title="New folder"
+          Favourite folders
+        </div>
+        {favoriteFolders.length === 0 ? (
+          <div
             style={{
-              marginLeft: "auto",
+              padding: "4px 10px 8px",
+              font: "400 12px/1.4 'Schibsted Grotesk', sans-serif",
               color: "var(--text-3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "transparent",
-              border: "none",
-              padding: "2px",
-              borderRadius: "5px",
-              cursor: "pointer",
             }}
           >
-            <Plus size={13} strokeWidth={2.2} />
-          </button>
-        </div>
-        {folders
-          .filter((f) => f.parentId == null)
-          .map((root) => (
-            <FolderTreeNode
-              key={root.id}
-              folder={root}
-              folders={folders}
-              depth={0}
-              activeId={params.id}
-              collapsedFolders={collapsedFolders}
-              onToggle={toggleFolder}
-              onNavigate={(fid) => navigate(`/folder/${fid}`)}
-            />
-          ))}
+            No favourite folders yet
+          </div>
+        ) : (
+          favoriteFolders.map((folder) => {
+            const isActive = params.id === folder.id;
+            return (
+              <NavRow
+                key={folder.id}
+                active={isActive}
+                onClick={() => navigate(`/folder/${folder.id}`)}
+              >
+                <span
+                  style={{
+                    width: "9px",
+                    height: "9px",
+                    borderRadius: "50%",
+                    flexShrink: 0,
+                    background: folder.color,
+                  }}
+                />
+                <span
+                  style={{
+                    flex: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {folder.name}
+                </span>
+                <span
+                  style={{
+                    font: "500 11.5px/1 'JetBrains Mono', monospace",
+                    color: isActive ? "var(--accent-text)" : "var(--text-3)",
+                  }}
+                >
+                  {folder.count}
+                </span>
+              </NavRow>
+            );
+          })
+        )}
 
         {/* Tags section */}
         <div
@@ -411,95 +416,6 @@ export function Sidebar() {
           </button>
         </div>
       )}
-
-      {folderModalOpen && (
-        <FolderModal onClose={() => setFolderModalOpen(false)} />
-      )}
     </aside>
-  );
-}
-
-function FolderTreeNode({
-  folder,
-  folders,
-  depth,
-  activeId,
-  collapsedFolders,
-  onToggle,
-  onNavigate,
-}: {
-  folder: Folder;
-  folders: Folder[];
-  depth: number;
-  activeId?: string;
-  collapsedFolders: Set<string>;
-  onToggle: (id: string) => void;
-  onNavigate: (id: string) => void;
-}) {
-  const children = folders.filter((f) => f.parentId === folder.id);
-  const hasChildren = children.length > 0;
-  const isOpen = !collapsedFolders.has(folder.id);
-  const isActive = activeId === folder.id;
-
-  return (
-    <>
-      <NavRow active={isActive} onClick={() => onNavigate(folder.id)}>
-        {depth > 0 && <span style={{ paddingLeft: `${depth * 14}px`, display: "flex", flexShrink: 0 }} />}
-        <span
-          onClick={(e) => {
-            if (hasChildren) {
-              e.stopPropagation();
-              onToggle(folder.id);
-            }
-          }}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "14px",
-            flexShrink: 0,
-            color: "var(--text-3)",
-            cursor: hasChildren ? "pointer" : "default",
-          }}
-        >
-          {hasChildren &&
-            (isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />)}
-        </span>
-        <span
-          style={{
-            width: "9px",
-            height: "9px",
-            borderRadius: "50%",
-            flexShrink: 0,
-            background: folder.color,
-          }}
-        />
-        <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {folder.name}
-        </span>
-        <span
-          style={{
-            font: "500 11.5px/1 'JetBrains Mono', monospace",
-            color: isActive ? "var(--accent-text)" : "var(--text-3)",
-          }}
-        >
-          {folder.count}
-        </span>
-      </NavRow>
-      {hasChildren &&
-        isOpen &&
-        children.map((child) => (
-          <FolderTreeNode
-            key={child.id}
-            folder={child}
-            folders={folders}
-            depth={depth + 1}
-            activeId={activeId}
-            collapsedFolders={collapsedFolders}
-            onToggle={onToggle}
-            onNavigate={onNavigate}
-          />
-        ))}
-    </>
   );
 }
