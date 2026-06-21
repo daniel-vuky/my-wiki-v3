@@ -1,0 +1,13 @@
+/* Scoped mark highlight styling for search results.
+ * Using a wrapper class to avoid leaking into other parts of the UI.
+ * ts_headline from Postgres injects <mark>…</mark> tags; the surrounding
+ * text is NOT HTML-escaped by Postgres, but content originates from the
+ * user's own notes in a single-user app (self-XSS risk only). */
+.folio-search mark {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  padding: 0 2px;
+  border-radius: 3px;
+  font-style: inherit;
+  font-weight: inherit;
+}
