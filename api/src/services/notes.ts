@@ -1,13 +1,19 @@
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, inArray } from "drizzle-orm";
 import { db } from "../db/client.js";
-import { notes } from "../db/schema.js";
+import { notes, noteTags, tags } from "../db/schema.js";
 import { blocksToPlaintext } from "../lib/markdown.js";
 import { setNoteTags, tagsForNote } from "./tags.js";
 
-export async function listNotes(userId: string, opts: { folderId?: string; favorite?: boolean } = {}) {
+export async function listNotes(userId: string, opts: { folderId?: string; favorite?: boolean; tag?: string } = {}) {
   const conds = [eq(notes.userId, userId)];
   if (opts.folderId) conds.push(eq(notes.folderId, opts.folderId));
   if (opts.favorite) conds.push(eq(notes.favorite, true));
+  if (opts.tag) {
+    const tagged = db.select({ id: noteTags.noteId }).from(noteTags)
+      .innerJoin(tags, eq(tags.id, noteTags.tagId))
+      .where(and(eq(tags.userId, userId), eq(tags.name, opts.tag)));
+    conds.push(inArray(notes.id, tagged));
+  }
   const rows = await db.select().from(notes).where(and(...conds)).orderBy(desc(notes.updatedAt));
   return Promise.all(rows.map(async (n) => ({ ...n, tags: await tagsForNote(n.id) })));
 }

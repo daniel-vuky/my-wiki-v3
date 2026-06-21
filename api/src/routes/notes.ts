@@ -8,9 +8,9 @@ export async function noteRoutes(app: FastifyInstance) {
   const bust = (u: string) => Promise.all([invalidate(`folders:${u}*`), invalidate(`notes:${u}*`), invalidate(`search:${u}*`)]);
 
   app.get("/api/notes", async (req) => {
-    const q = req.query as { folder?: string; favorite?: string };
-    return cached(cacheKey("notes", req.userId!, `${q.folder ?? ""}|${q.favorite ?? ""}`), 30, () =>
-      svc.listNotes(req.userId!, { folderId: q.folder, favorite: q.favorite === "true" }));
+    const q = req.query as { folder?: string; favorite?: string; tag?: string };
+    return cached(cacheKey("notes", req.userId!, `${q.folder ?? ""}|${q.favorite ?? ""}|${q.tag ?? ""}`), 30, () =>
+      svc.listNotes(req.userId!, { folderId: q.folder, favorite: q.favorite === "true", tag: q.tag }));
   });
 
   app.get("/api/notes/:id", async (req, reply) => {
