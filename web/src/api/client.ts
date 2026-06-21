@@ -14,9 +14,15 @@ export const api = {
   me: () => req<{ user: User; prefs: Prefs }>("/api/auth/me"),
   logout: () => req("/api/auth/logout", { method: "POST" }),
   folders: () => req<Folder[]>("/api/folders"),
-  createFolder: (b: { name: string; color: string; description?: string }) => req<Folder>("/api/folders", { method: "POST", body: JSON.stringify(b) }),
-  notes: (q?: { folder?: string; favorite?: boolean }) =>
-    req<Note[]>("/api/notes" + (q?.folder ? `?folder=${q.folder}` : q?.favorite ? "?favorite=true" : "")),
+  createFolder: (b: { name: string; color: string; description?: string; parentId?: string | null }) => req<Folder>("/api/folders", { method: "POST", body: JSON.stringify(b) }),
+  notes: (q?: { folder?: string; favorite?: boolean; tag?: string }) => {
+    const p = new URLSearchParams();
+    if (q?.folder) p.set("folder", q.folder);
+    if (q?.favorite) p.set("favorite", "true");
+    if (q?.tag) p.set("tag", q.tag);
+    const qs = p.toString();
+    return req<Note[]>("/api/notes" + (qs ? `?${qs}` : ""));
+  },
   note: (id: string) => req<Note>(`/api/notes/${id}`),
   createNote: (b: { folderId?: string; title?: string }) => req<Note>("/api/notes", { method: "POST", body: JSON.stringify(b) }),
   updateNote: (id: string, b: Partial<{ title: string; content: string; folderId: string | null; tags: string[] }>) =>
