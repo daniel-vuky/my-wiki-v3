@@ -39,6 +39,15 @@ export default function Folder() {
     },
   });
 
+  const createNote = useMutation({
+    mutationFn: () => api.createNote({ folderId: id }),
+    onSuccess: (note) => {
+      void qc.invalidateQueries({ queryKey: ["notes"] });
+      void qc.invalidateQueries({ queryKey: ["folders"] });
+      navigate(`/note/${note.id}`);
+    },
+  });
+
   function handleDeleteFolder() {
     if (window.confirm("Delete this folder? Its subfolders are also deleted; notes inside become unfiled.")) {
       deleteFolderMutation.mutate();
@@ -137,6 +146,28 @@ export default function Folder() {
 
           {/* Right controls */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+            {/* New note button */}
+            <button
+              onClick={() => createNote.mutate()}
+              disabled={createNote.isPending}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 14px",
+                borderRadius: "7px",
+                background: "var(--accent)",
+                border: "none",
+                color: "#1c1408",
+                font: "600 12.5px/1 'Schibsted Grotesk', sans-serif",
+                cursor: createNote.isPending ? "not-allowed" : "pointer",
+                opacity: createNote.isPending ? 0.7 : 1,
+              }}
+            >
+              <Plus size={14} strokeWidth={2.4} />
+              New note
+            </button>
+
             {/* Favourite toggle */}
             <button
               onClick={() => favoriteFolderMutation.mutate()}

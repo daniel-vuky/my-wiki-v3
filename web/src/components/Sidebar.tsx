@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, Plus, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Search, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
 import { api } from "../api/client";
 import { useAuth } from "../state/AuthContext";
 import { Kbd } from "./ui/Kbd";
@@ -60,7 +60,6 @@ export function Sidebar() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const params = useParams<{ id?: string }>();
-  const queryClient = useQueryClient();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [favPostsHovered, setFavPostsHovered] = useState(false);
   const [favFoldersHovered, setFavFoldersHovered] = useState(false);
@@ -78,15 +77,6 @@ export function Sidebar() {
   const { data: favoritePosts = [] } = useQuery<Note[]>({
     queryKey: ["notes", "favorites"],
     queryFn: () => api.notes({ favorite: true }),
-  });
-
-  const createNote = useMutation({
-    mutationFn: () => api.createNote({}),
-    onSuccess: (note) => {
-      void queryClient.invalidateQueries({ queryKey: ["folders"] });
-      void queryClient.invalidateQueries({ queryKey: ["notes"] });
-      navigate(`/note/${note.id}`);
-    },
   });
 
   const favoriteFolders = folders.filter((f) => f.favorite);
@@ -187,32 +177,6 @@ export function Sidebar() {
         <Search size={15} />
         <span style={{ flex: 1, textAlign: "left" }}>Search</span>
         <Kbd>⌘K</Kbd>
-      </button>
-
-      {/* New note button */}
-      <button
-        onClick={() => createNote.mutate()}
-        disabled={createNote.isPending}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "8px",
-          padding: "9px 10px",
-          borderRadius: "9px",
-          background: "var(--accent)",
-          border: "none",
-          color: "#1c1408",
-          font: "600 13px/1 'Schibsted Grotesk', sans-serif",
-          cursor: createNote.isPending ? "not-allowed" : "pointer",
-          marginBottom: "18px",
-          width: "100%",
-          boxSizing: "border-box",
-          opacity: createNote.isPending ? 0.7 : 1,
-        }}
-      >
-        <Plus size={15} strokeWidth={2.4} />
-        New note
       </button>
 
       {/* Overflow scrollable area */}
