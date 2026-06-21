@@ -16,6 +16,7 @@ export function FolderModal({
 }) {
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [color, setColor] = useState(PALETTE[0]);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -33,7 +34,7 @@ export function FolderModal({
 
   const create = useMutation({
     mutationFn: () =>
-      api.createFolder({ name: name.trim(), color, parentId: parentId ?? null }),
+      api.createFolder({ name: name.trim(), color, description: description.trim() || undefined, parentId: parentId ?? null }),
     onSuccess: (folder) => {
       void queryClient.invalidateQueries({ queryKey: ["folders"] });
       onCreated?.(folder);
@@ -96,6 +97,24 @@ export function FolderModal({
             border: "1px solid var(--border)",
             color: "var(--text)",
             font: "500 13.5px/1 'Schibsted Grotesk', sans-serif",
+            outline: "none",
+            marginBottom: "10px",
+          }}
+        />
+
+        <input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Description (optional)"
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+            padding: "9px 11px",
+            borderRadius: "8px",
+            background: "var(--surface-2)",
+            border: "1px solid var(--border)",
+            color: "var(--text)",
+            font: "400 13px/1 'Schibsted Grotesk', sans-serif",
             outline: "none",
             marginBottom: "16px",
           }}
