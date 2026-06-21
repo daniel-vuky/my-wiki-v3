@@ -1,0 +1,29 @@
+import { FastifyInstance } from "fastify";
+import { requireAuth } from "../auth/middleware.js";
+import { listFolders, createFolder, updateFolder, deleteFolder } from "../services/folders.js";
+import { cacheKey, cached, invalidate } from "../cache/redis.js";
+
+export async function folderRoutes(app: FastifyInstance) {
+  app.addHook("preHandler", requireAuth);
+
+  app.get("/api/folders", async (req) =>
+    cached(cacheKey("folders", req.userId!), 60, () => listFolders(req.userId!)));
+
+  app.post("/api/folders", async (req) => {
+    const row = await createFolder(req.userId!, req.body as any);
+    await invalidate(`folders:${req.userId}*`);
+    return row;
+  });
+
+  app.patch("/api/folders/:id", async (req) => {
+    const row = await updateFolder(req.userId!, (req.params as any).id, req.body as any);
+    await invalidate(`folders:${req.userId}*`);
+    return row;
+  });
+
+  app.delete("/api/folders/:id", async (req) => {
+    await deleteFolder(req.userId!, (req.params as any).id);
+    await invalidate(`folders:${req.userId}*`);
+    return { ok: true };
+  });
+}
