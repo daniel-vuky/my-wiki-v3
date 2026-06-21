@@ -483,7 +483,6 @@ export default function Folder() {
         <FolderModal
           parentId={id}
           onClose={() => setSubfolderModalOpen(false)}
-          onCreated={(f) => navigate(`/folder/${f.id}`)}
         />
       )}
     </AppShell>

@@ -61,6 +61,7 @@ export default function Home() {
     .slice(0, 3);
 
   const folderMap = new Map<string, Folder>(folders.map((f) => [f.id, f]));
+  const rootFolders = folders.filter((f) => f.parentId == null);
   const totalNotes = folders.reduce((sum, f) => sum + f.count, 0);
 
   return (
@@ -170,7 +171,7 @@ export default function Home() {
               Continue where you left off
             </span>
             <Link
-              to="/"
+              to="/notes"
               style={{
                 font: "500 13px/1 'Schibsted Grotesk', sans-serif",
                 color: "var(--accent-text)",
@@ -283,14 +284,26 @@ export default function Home() {
             >
               Folders
             </span>
-            <span
-              style={{
-                font: "500 12px/1 'Schibsted Grotesk', sans-serif",
-                color: "var(--text-3)",
-              }}
-            >
-              {folders.length} folders · {totalNotes} notes
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <span
+                style={{
+                  font: "500 12px/1 'Schibsted Grotesk', sans-serif",
+                  color: "var(--text-3)",
+                }}
+              >
+                {rootFolders.length} folders · {totalNotes} notes
+              </span>
+              <Link
+                to="/folders"
+                style={{
+                  font: "500 13px/1 'Schibsted Grotesk', sans-serif",
+                  color: "var(--accent-text)",
+                  textDecoration: "none",
+                }}
+              >
+                View all
+              </Link>
+            </div>
           </div>
 
           <div
@@ -300,7 +313,7 @@ export default function Home() {
               gap: "18px",
             }}
           >
-            {folders.map((folder) => {
+            {rootFolders.map((folder) => {
               const softBg = folder.color + "29";
               return (
                 <Card
@@ -378,10 +391,6 @@ export default function Home() {
       {folderModalOpen && (
         <FolderModal
           onClose={() => setFolderModalOpen(false)}
-          onCreated={(f) => {
-            setFolderModalOpen(false);
-            navigate(`/folder/${f.id}`);
-          }}
         />
       )}
     </AppShell>
