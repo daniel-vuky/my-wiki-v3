@@ -36,6 +36,7 @@ export const api = {
   favorite: (id: string) => req<{ id: string; favorite: boolean }>(`/api/notes/${id}/favorite`, { method: "POST" }),
   deleteNote: (id: string) => req(`/api/notes/${id}`, { method: "DELETE" }),
   deleteFolder: (id: string) => req(`/api/folders/${id}`, { method: "DELETE" }),
+  favoriteFolder: (id: string) => req<{ id: string; favorite: boolean }>(`/api/folders/${id}/favorite`, { method: "POST" }),
   tags: () => req<TagCount[]>("/api/tags"),
   search: (q: string, folder?: string) => req<SearchResponse>(`/api/search?q=${encodeURIComponent(q)}${folder ? `&folder=${folder}` : ""}`),
   updatePrefs: (b: Partial<{ theme: string; accent: string; editorFont: string }>) =>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { List, LayoutGrid, Plus } from "lucide-react";
+import { List, LayoutGrid, Plus, Star } from "lucide-react";
 import { Trash2 } from "../components/icons";
 import { AppShell } from "../components/AppShell";
 import { Card } from "../components/ui/Card";
@@ -31,6 +31,13 @@ export default function Folder() {
       void qc.invalidateQueries({ queryKey: ["folders"] });
       void qc.invalidateQueries({ queryKey: ["notes"] });
       navigate("/");
+    },
+  });
+
+  const favoriteFolderMutation = useMutation({
+    mutationFn: () => api.favoriteFolder(id!),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["folders"] });
     },
   });
 
@@ -132,6 +139,32 @@ export default function Folder() {
 
           {/* Right controls */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
+            {/* Favourite toggle */}
+            <button
+              onClick={() => favoriteFolderMutation.mutate()}
+              disabled={favoriteFolderMutation.isPending}
+              title={folder.favorite ? "Remove from favourites" : "Add to favourites"}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "7px 10px",
+                borderRadius: "7px",
+                background: "transparent",
+                border: "1px solid var(--border)",
+                color: folder.favorite ? "var(--accent-text)" : "var(--text-3)",
+                cursor: favoriteFolderMutation.isPending ? "not-allowed" : "pointer",
+                opacity: favoriteFolderMutation.isPending ? 0.6 : 1,
+                transition: "color .12s",
+              }}
+            >
+              <Star
+                size={15}
+                strokeWidth={1.8}
+                fill={folder.favorite ? "currentColor" : "none"}
+              />
+            </button>
+
             {/* Delete folder button */}
             <button
               onClick={handleDeleteFolder}
