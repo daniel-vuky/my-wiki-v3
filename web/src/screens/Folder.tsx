@@ -27,7 +27,8 @@ export default function Folder() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["folders"] });
       void qc.invalidateQueries({ queryKey: ["notes"] });
-      navigate("/");
+      const parentId = folders.find((f) => f.id === id)?.parentId ?? null;
+      navigate(parentId ? `/folder/${parentId}` : "/");
     },
   });
 
