@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { List, LayoutGrid, Plus } from "lucide-react";
+import { Trash2 } from "../components/icons";
 import { AppShell } from "../components/AppShell";
 import { Card } from "../components/ui/Card";
 import { Chip } from "../components/ui/Chip";
@@ -14,6 +15,7 @@ import type { Folder as FolderType, Note } from "../types";
 export default function Folder() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [view, setView] = useState<"list" | "grid">("grid");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [subfolderModalOpen, setSubfolderModalOpen] = useState(false);
@@ -22,6 +24,21 @@ export default function Folder() {
     queryKey: ["folders"],
     queryFn: api.folders,
   });
+
+  const deleteFolderMutation = useMutation({
+    mutationFn: () => api.deleteFolder(id!),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["folders"] });
+      void qc.invalidateQueries({ queryKey: ["notes"] });
+      navigate("/");
+    },
+  });
+
+  function handleDeleteFolder() {
+    if (window.confirm("Delete this folder? Its subfolders are also deleted; notes inside become unfiled.")) {
+      deleteFolderMutation.mutate();
+    }
+  }
 
   const { data: notes = [] } = useQuery<Note[]>({
     queryKey: ["notes", "folder", id],
@@ -115,6 +132,39 @@ export default function Folder() {
 
           {/* Right controls */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0, marginTop: "4px" }}>
+            {/* Delete folder button */}
+            <button
+              onClick={handleDeleteFolder}
+              disabled={deleteFolderMutation.isPending}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 12px",
+                borderRadius: "7px",
+                background: "transparent",
+                border: "1px solid var(--border)",
+                color: "var(--text-3)",
+                font: "500 12.5px/1 'Schibsted Grotesk', sans-serif",
+                cursor: deleteFolderMutation.isPending ? "not-allowed" : "pointer",
+                opacity: deleteFolderMutation.isPending ? 0.6 : 1,
+                transition: "color .12s, border-color .12s",
+              }}
+              onMouseEnter={(e) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.color = "#e53e3e";
+                btn.style.borderColor = "#e53e3e";
+              }}
+              onMouseLeave={(e) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.color = "var(--text-3)";
+                btn.style.borderColor = "var(--border)";
+              }}
+            >
+              <Trash2 size={14} strokeWidth={2} />
+              Delete folder
+            </button>
+
             {/* Add subfolder button */}
             <button
               onClick={() => setSubfolderModalOpen(true)}
