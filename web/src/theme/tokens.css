@@ -1,0 +1,25 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Schibsted Grotesk', sans-serif; background: var(--bg); color: var(--text); }
+::selection { background: rgba(91,155,213,.32); }
+
+:root, [data-theme="dark"] {
+  --bg:#111317; --surface:#16181d; --surface-2:#1d2026;
+  --border:#272b33; --border-soft:#1e2229;
+  --text:#e9eaee; --text-2:#a3a7b2; --text-3:#6b6f7a; --code-bg:#0d0f13;
+  --editor-font: 'Newsreader', serif;
+}
+[data-theme="light"] {
+  --bg:#ffffff; --surface:#faf9f7; --surface-2:#f1efea;
+  --border:#e7e3db; --border-soft:#efece6;
+  --text:#1d1c19; --text-2:#6a6862; --text-3:#9a978e; --code-bg:#f6f4f0;
+}
+[data-editorfont="Sans"] { --editor-font: 'Schibsted Grotesk', sans-serif; }
+
+:root, [data-accent="amber"] { --accent:#e0a548; --accent-text:#f0c074; --accent-soft:rgba(224,165,72,.15); }
+[data-theme="light"][data-accent="amber"] { --accent:#b27c22; --accent-text:#8c5f16; --accent-soft:rgba(178,124,34,.12); }
+[data-accent="teal"]  { --accent:#3fa896; --accent-text:#5cc4b2; --accent-soft:rgba(63,168,150,.15); }
+[data-theme="light"][data-accent="teal"]  { --accent:#2c8475; --accent-text:#1f6457; --accent-soft:rgba(44,132,117,.12); }
+[data-accent="blue"]  { --accent:#5b9bd5; --accent-text:#7db3e6; --accent-soft:rgba(91,155,213,.15); }
+[data-theme="light"][data-accent="blue"]  { --accent:#2f6fb0; --accent-text:#235488; --accent-soft:rgba(47,111,176,.12); }
+[data-accent="rose"]  { --accent:#d97a86; --accent-text:#e89aa3; --accent-soft:rgba(217,122,134,.15); }
+[data-theme="light"][data-accent="rose"]  { --accent:#b5505d; --accent-text:#8f3a45; --accent-soft:rgba(181,80,93,.12); }
