@@ -1,7 +1,13 @@
 import type { User, Prefs, Folder, Note, TagCount, SearchResponse } from "../types";
 
-async function req<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, { credentials: "include", headers: { "Content-Type": "application/json" }, ...init });
+async function req<T>(url: string, init: RequestInit = {}): Promise<T> {
+  // Only send a JSON content-type when there's actually a body. Sending
+  // `Content-Type: application/json` with an empty body makes Fastify reject
+  // the request with 400 at the parsing stage (before auth) — which breaks
+  // no-body mutations like DELETE, favorite, and logout.
+  const headers: Record<string, string> = { ...(init.headers as Record<string, string>) };
+  if (init.body != null) headers["Content-Type"] = "application/json";
+  const res = await fetch(url, { credentials: "include", ...init, headers });
   if (res.status === 401) { window.location.href = "/signin"; throw new Error("unauthorized"); }
   if (!res.ok) {
     const body = await res.json().catch(() => ({} as any));
