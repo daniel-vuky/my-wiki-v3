@@ -1,0 +1,241 @@
+/*
+ * blocknote-folio.css
+ * Maps BlockNote/Mantine CSS variables to Folio design tokens.
+ *
+ * BlockNote uses .bn-root[data-color-scheme="light|dark"] to set its own
+ * color variables. We override them inside .bn-container (which wraps
+ * .bn-root) using Folio's CSS custom properties so both themes are covered.
+ *
+ * Variables overridden (from @blocknote/react/src/editor/styles.css):
+ *   --bn-colors-editor-background  → --bg
+ *   --bn-colors-editor-text        → --text
+ *   --bn-colors-menu-background    → --surface-2
+ *   --bn-colors-menu-text          → --text
+ *   --bn-colors-tooltip-background → --surface-2
+ *   --bn-colors-tooltip-text       → --text-2
+ *   --bn-colors-hovered-background → --surface-2
+ *   --bn-colors-hovered-text       → --text
+ *   --bn-colors-selected-background→ --accent-soft
+ *   --bn-colors-selected-text      → --accent-text
+ *   --bn-colors-disabled-text      → --text-3
+ *   --bn-colors-disabled-background→ --surface
+ *   --bn-colors-border             → --border
+ *   --bn-colors-shadow             → rgba(0,0,0,.18)
+ *   --bn-colors-side-menu          → --text-3
+ *   --bn-font-family               → --editor-font (body), Schibsted for UI
+ */
+
+/* ── Root container override (both themes) ──────────────────────────── */
+.bn-container {
+  --bn-colors-editor-background: var(--bg);
+  --bn-colors-editor-text: var(--text);
+  --bn-colors-menu-background: var(--surface-2);
+  --bn-colors-menu-text: var(--text);
+  --bn-colors-tooltip-background: var(--surface-2);
+  --bn-colors-tooltip-text: var(--text-2);
+  --bn-colors-hovered-background: var(--surface);
+  --bn-colors-hovered-text: var(--text);
+  --bn-colors-selected-background: var(--accent-soft);
+  --bn-colors-selected-text: var(--accent-text);
+  --bn-colors-disabled-text: var(--text-3);
+  --bn-colors-disabled-background: var(--surface);
+  --bn-colors-border: var(--border);
+  --bn-colors-shadow: rgba(0, 0, 0, 0.18);
+  --bn-colors-side-menu: var(--text-3);
+  /* Keep UI chrome (menus, toolbar) on Schibsted Grotesk */
+  --bn-font-family: "Schibsted Grotesk", sans-serif;
+}
+
+/* ── Override dark-mode defaults that BlockNote bakes into .bn-root[data-color-scheme="dark"] ── */
+.bn-root[data-color-scheme="dark"] {
+  --bn-colors-editor-background: var(--bg);
+  --bn-colors-editor-text: var(--text);
+  --bn-colors-menu-background: var(--surface-2);
+  --bn-colors-menu-text: var(--text);
+  --bn-colors-tooltip-background: var(--surface-2);
+  --bn-colors-tooltip-text: var(--text-2);
+  --bn-colors-hovered-background: var(--surface);
+  --bn-colors-hovered-text: var(--text);
+  --bn-colors-selected-background: var(--accent-soft);
+  --bn-colors-selected-text: var(--accent-text);
+  --bn-colors-disabled-text: var(--text-3);
+  --bn-colors-disabled-background: var(--surface);
+  --bn-colors-border: var(--border);
+  --bn-colors-shadow: rgba(0, 0, 0, 0.3);
+  --bn-colors-side-menu: var(--text-3);
+}
+
+/* ── Override light-mode defaults ───────────────────────────────────── */
+.bn-root[data-color-scheme="light"] {
+  --bn-colors-editor-background: var(--bg);
+  --bn-colors-editor-text: var(--text);
+  --bn-colors-menu-background: var(--surface-2);
+  --bn-colors-menu-text: var(--text);
+  --bn-colors-tooltip-background: var(--surface-2);
+  --bn-colors-tooltip-text: var(--text-2);
+  --bn-colors-hovered-background: var(--surface);
+  --bn-colors-hovered-text: var(--text);
+  --bn-colors-selected-background: var(--accent-soft);
+  --bn-colors-selected-text: var(--accent-text);
+  --bn-colors-disabled-text: var(--text-3);
+  --bn-colors-disabled-background: var(--surface);
+  --bn-colors-border: var(--border);
+  --bn-colors-shadow: rgba(0, 0, 0, 0.08);
+  --bn-colors-side-menu: var(--text-3);
+}
+
+/* ── Editor body: use Folio editor font token (Newsreader or Sans) ─── */
+.bn-editor {
+  font-family: var(--editor-font) !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  caret-color: var(--accent);
+}
+
+/* ── Headings: Newsreader serif regardless of editorFont pref ────────── */
+.bn-editor h1,
+.bn-editor h2,
+.bn-editor h3,
+.bn-editor [data-content-type="heading"] {
+  font-family: "Newsreader", serif !important;
+  color: var(--text) !important;
+}
+
+/* ── Code block / inline code: use --code-bg token ──────────────────── */
+.bn-editor code,
+.bn-editor [data-content-type="codeBlock"],
+.bn-editor .bn-code-block {
+  background: var(--code-bg) !important;
+  color: var(--text-2) !important;
+  font-family: "Fira Mono", "Cascadia Code", "SF Mono", monospace !important;
+  border-radius: 4px;
+}
+
+/* ── Slash-menu (suggestion menu) popover ───────────────────────────── */
+.bn-mantine .bn-suggestion-menu {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+  border-radius: 10px !important;
+}
+
+.bn-mantine .bn-suggestion-menu-item {
+  color: var(--text) !important;
+  border-radius: 7px !important;
+}
+
+.bn-mantine .bn-suggestion-menu-item[aria-selected="true"],
+.bn-mantine .bn-suggestion-menu-item:hover {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+.bn-mantine .bn-suggestion-menu-label {
+  color: var(--text-3) !important;
+}
+
+.bn-mt-suggestion-menu-item-title {
+  color: var(--text) !important;
+}
+
+.bn-mt-suggestion-menu-item-subtitle {
+  color: var(--text-2) !important;
+}
+
+.bn-mt-suggestion-menu-item-section[data-position="left"] {
+  background-color: var(--surface) !important;
+  color: var(--text-2) !important;
+}
+
+/* ── Formatting toolbar ──────────────────────────────────────────────── */
+.bn-mantine .bn-toolbar {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+  border-radius: 8px !important;
+}
+
+.bn-toolbar .mantine-Button-root,
+.bn-toolbar .mantine-ActionIcon-root {
+  background-color: transparent !important;
+  color: var(--text-2) !important;
+  border-radius: 5px !important;
+}
+
+.bn-toolbar .mantine-Button-root:hover,
+.bn-toolbar .mantine-ActionIcon-root:hover {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+.bn-toolbar .mantine-Button-root[data-selected],
+.bn-toolbar .mantine-ActionIcon-root[data-selected] {
+  background-color: var(--accent-soft) !important;
+  color: var(--accent-text) !important;
+}
+
+/* ── Tooltip ────────────────────────────────────────────────────────── */
+.bn-mantine .bn-tooltip {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-2) !important;
+  border-radius: 6px !important;
+}
+
+/* ── Side menu (drag handle) ─────────────────────────────────────────── */
+.bn-side-menu .mantine-UnstyledButton-root:not(.mantine-Menu-item) svg {
+  color: var(--text-3) !important;
+}
+
+.bn-side-menu .mantine-UnstyledButton-root:hover {
+  background-color: var(--surface-2) !important;
+}
+
+/* ── Mantine-level dropdown menus (context/drag menus) ──────────────── */
+.bn-mantine .mantine-Menu-dropdown,
+.bn-mantine .bn-menu-dropdown {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+.bn-mantine .mantine-Menu-item {
+  background-color: var(--surface-2) !important;
+  color: var(--text) !important;
+  border-radius: 6px !important;
+}
+
+.bn-mantine .mantine-Menu-item[aria-selected="true"],
+.bn-mantine .mantine-Menu-item:hover {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+/* ── Image / media panel ─────────────────────────────────────────────── */
+.bn-mantine .bn-panel {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* ── Table handles ───────────────────────────────────────────────────── */
+.bn-mantine .bn-table-handle,
+.bn-mantine .bn-extend-button,
+.bn-mantine .bn-table-cell-handle {
+  background-color: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-3) !important;
+}
+
+/* ── Blockquote / callout left bar ───────────────────────────────────── */
+.bn-editor [data-node-type="blockContainer"] > [data-content-type="bulletListItem"]::before,
+.bn-editor [data-node-type="blockContainer"] > [data-content-type="numberedListItem"]::before {
+  color: var(--accent) !important;
+}
+
+/* Remove extra outer BG that can bleed through */
+.bn-container,
+.bn-root,
+.bn-editor .ProseMirror {
+  background: var(--bg) !important;
+}
