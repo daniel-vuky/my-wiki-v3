@@ -1,12 +1,15 @@
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "../components/AppShell";
 import { Card } from "../components/ui/Card";
 import { Chip } from "../components/ui/Chip";
+import { FolderModal } from "../components/FolderModal";
 import { useAuth } from "../state/AuthContext";
 import { api } from "../api/client";
 import { relativeTime } from "../lib/time";
 import { extractSnippet } from "../lib/snippet";
+import { FolderPlus } from "../components/icons";
 import type { Folder, Note } from "../types";
 
 function formatDate(d: Date): string {
@@ -27,6 +30,7 @@ export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [folderModalOpen, setFolderModalOpen] = useState(false);
 
   const { data: folders = [] } = useQuery<Folder[]>({
     queryKey: ["folders"],
@@ -94,6 +98,24 @@ export default function Home() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <button
+            onClick={() => setFolderModalOpen(true)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              padding: "8px 16px",
+              borderRadius: "8px",
+              background: "transparent",
+              border: "1px solid var(--border)",
+              color: "var(--text-2)",
+              font: "600 13px/1 'Schibsted Grotesk', sans-serif",
+              cursor: "pointer",
+            }}
+          >
+            <FolderPlus size={14} strokeWidth={2} />
+            New folder
+          </button>
           <button
             onClick={() => createNote.mutate()}
             disabled={createNote.isPending}
@@ -352,6 +374,16 @@ export default function Home() {
           </div>
         </section>
       </div>
+
+      {folderModalOpen && (
+        <FolderModal
+          onClose={() => setFolderModalOpen(false)}
+          onCreated={(f) => {
+            setFolderModalOpen(false);
+            navigate(`/folder/${f.id}`);
+          }}
+        />
+      )}
     </AppShell>
   );
 }
