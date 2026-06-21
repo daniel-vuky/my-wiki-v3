@@ -1,13 +1,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import type { Prefs, Theme, Accent, EditorFont } from "../types";
+import { api } from "../api/client";
 
 const DEFAULT: Prefs = { theme: "dark", accent: "amber", editorFont: "Serif" };
 const KEY = "folio.prefs";
 
 interface Ctx {
   prefs: Prefs;
-  setTheme: (t: Theme) => void; setAccent: (a: Accent) => void; setEditorFont: (f: EditorFont) => void;
+  setTheme: (t: Theme) => void;
+  setAccent: (a: Accent) => void;
+  setEditorFont: (f: EditorFont) => void;
+  setAll: (incoming: Prefs) => void;
 }
 const PrefsCtx = createContext<Ctx | null>(null);
 
@@ -25,9 +29,19 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
   return (
     <PrefsCtx.Provider value={{
       prefs,
-      setTheme: (theme) => setPrefs((p) => ({ ...p, theme })),
-      setAccent: (accent) => setPrefs((p) => ({ ...p, accent })),
-      setEditorFont: (editorFont) => setPrefs((p) => ({ ...p, editorFont })),
+      setTheme: (theme) => {
+        setPrefs((p) => ({ ...p, theme }));
+        api.updatePrefs({ theme }).catch(() => {});
+      },
+      setAccent: (accent) => {
+        setPrefs((p) => ({ ...p, accent }));
+        api.updatePrefs({ accent }).catch(() => {});
+      },
+      setEditorFont: (editorFont) => {
+        setPrefs((p) => ({ ...p, editorFont }));
+        api.updatePrefs({ editorFont }).catch(() => {});
+      },
+      setAll: (incoming) => setPrefs((p) => ({ ...p, ...incoming })),
     }}>{children}</PrefsCtx.Provider>
   );
 }

@@ -25,4 +25,6 @@ export const api = {
   deleteNote: (id: string) => req(`/api/notes/${id}`, { method: "DELETE" }),
   tags: () => req<TagCount[]>("/api/tags"),
   search: (q: string, folder?: string) => req<SearchResponse>(`/api/search?q=${encodeURIComponent(q)}${folder ? `&folder=${folder}` : ""}`),
+  updatePrefs: (b: Partial<{ theme: string; accent: string; editorFont: string }>) =>
+    req<Prefs>("/api/prefs", { method: "PATCH", body: JSON.stringify(b) }),
 };
