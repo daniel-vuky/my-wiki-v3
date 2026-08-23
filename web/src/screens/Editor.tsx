@@ -354,7 +354,6 @@ export default function Editor() {
         <div
           style={{
             width: "100%",
-            maxWidth: "760px",
             padding: "46px 40px 60px",
             margin: "0 auto",
           }}
